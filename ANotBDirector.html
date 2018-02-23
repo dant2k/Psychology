@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<!--
+    A not B paradigm guidance tool.
+    Copyright (c) 2018 Dan Thompson, Stephanie Fengler Thompson.
+    
+    This work is licensed under the Creative Commons Attribution 4.0 International License. 
+    To view a copy of this license, visit http://creativecommons.org/licenses/by/4.0/ or 
+    send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+    
+    This tool is based on the AB task procedure as presented by Diamond(1) to
+    measure observations made by Piaget (2). 
+    
+    Differences are:
+    -- Delays are introduced. Delays always start at 0, as this task was not part of a longitudinal study. 
+    -- There are increments in delay (0->3->5->10->15) contingent on successful performance until the A not B error is 
+       observed, with up to five reversals.  
+    -- Initial failure metric (discontinue rule) is 5 incorrect reaches upon first hiding.
+ 
+    References:
+    
+    1 -- Diamond, A., & Doar, B. (1989). The performance of human infants on a 
+        measure of frontal cortex function, the delayed response task. 
+        Developmental Psychobiology, 22(3), 271-294.
+    2 -- Piaget, J. (1974). The construction of reality in the child. New York: Ballantine Books.
+    
+    Version History:
+    (Update version in source code line ~136 when changing)
+    
+    .90 - Feb 23, 2018 - pre-release for testing.
+    
+    The latest version of this file can be found at:
+    https://github.com/dant2k/Psychology/blob/master/ANotBDirector.html
+    
+-->
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta charset="utf-8"/>
+<style>
+.button 
+{
+    background-color: #42b6f4;
+    border: none;
+    color: white;
+    padding: 1em 2em;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 4vw;
+    cursor: pointer;
+    margin:2em;
+}
+
+.wrongbutton
+{
+    background-color: #42b6f4;
+    border: none;
+    color: white;
+    padding: 1em 2em;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 4vw;
+    cursor: pointer;
+}
+
+.beginbutton 
+{
+    background-color: #42b6f4;
+    border: none;
+    color: white;
+    padding: 1em 2em;
+    font-size: 3vw;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+table, th, td {
+    border: 1px solid silver;
+    border-collapse: collapse;
+    text-align: center;
+}
+
+table tr:nth-child(odd) td
+{
+}
+table tr:nth-child(even) td
+{
+    background-color: aliceblue;
+}
+
+.dot-table
+{
+    background-color: white;
+    border: 0px solid black;
+    font-size:2em;
+    margin-left:auto;
+    margin-right:auto;
+    width:10em;
+}
+
+.dot-table tr:nth-child(even) td
+{
+    background-color: white;
+}
+
+.dot-table td 
+{
+    background-color: white;
+    border: 0px solid black;
+    padding-top:1em;
+    text-align:left;
+    overflow:hidden;
+    white-space:nowrap;
+}
+
+.dot-table td:first-child:after 
+{
+    background-color: white;
+    border: 0px solid black;
+    color: #dbdbdb;
+    content:" ................................................ "
+}
+
+
+
+</style>
+</head>
+
+<body>
+    <div style="color: gray; text-align:center; font-size: 10vw;"/>
+    A<span style="text-decoration:overline">B</span>
+    </div>
+    <div style="color: silver; text-align:center; font-size: 2vw;"/>
+    Version: .90
+    </div>
+        
+    
+    <div id="begin_wrap" style="text-align: center; margin-top: 5em;"/>
+        <span style="font-size: 3em">Family ID:</span><input style="font-size:3em" type="number" id="_famidinput"/><br/>
+        <button class="beginbutton" style="margin-top:2em" id="_begin" onclick="BeginActivity()">Start Activity</button>
+    </div>
+    
+    <div id="main_display" style="display: none; text-align:center; margin-top:5em;">
+        <table class="dot-table">
+          <tr>
+            <td>
+               Well
+            </td>
+            <td id="_well" style="text-align:right;">
+               A
+            </td>
+          </tr>
+        </table>
+        <table class="dot-table">
+          <tr style="margin-top:1em">
+            <td>
+               Delay
+            </td>
+            <td id="_delay" style="text-align:right;">
+               0
+            </td>
+           </tr>
+        </table>
+
+        <div id="buttons" style="margin-top: 2em">
+            <button class="button" style="background-color:#4dd67a" onclick="Correct()" >Correct</button><br/>
+            <button class="wrongbutton" onclick="Wrong(1)" >Wrong</button>
+            <button class="wrongbutton" onclick="Wrong(2)" >None</button>
+            <button class="wrongbutton" onclick="Wrong(3)" >Both</button>
+        </div>       
+        
+        <div style="margin-top: 6em">
+            <button class="button" style="margin-top: 5em; background: repeating-linear-gradient(45deg, #ff7575, #ff7575 1em, crimson 1em, crimson 2em); background-color: #ff7575; margin-top:0em;" onclick="SwitchToEnd()">End Early - Fussy Baby</>
+        </div>
+    </div>
+
+    <div id="confirm" style="display: none;">
+        <div style="color: gray; text-align:center; font-size: 10vw;  margin-top:2em;"/>
+        You selected:
+        </div>
+        <div id="_confirm" style="color: black; text-align:center; font-size: 10vw;"/>
+        Correct
+        </div>
+        
+        <div style="margin-top: 1em; text-align:center;">
+            <button class="button" style=" background-color:#4dd67a" onclick="Confirm()" >Confirm</button>
+        </div>        
+        <div style="text-align:center;">
+            <button class="button" style=" background-color:#ff7575" onclick="SwitchToMain()" >No</button>
+        </div>   
+    </div>
+    
+    <div id="results" style="display: none;">
+        <div style="color: gray; text-align:center; font-size: 4vw;  margin-top:2em;"/>
+        Results
+        </div>
+        
+        <table class="dot-table">
+          <tr>
+            <td>
+               Family ID
+            </td>
+            <td id="_famid" style="text-align:right;">
+               101
+            </td>
+          </tr>
+        </table>
+        <table class="dot-table">
+          <tr style="margin-top:1em">
+            <td>
+               Date
+            </td>
+            <td style="text-align:right;">
+               <script> document.write(new Date().toLocaleDateString()); </script>
+            </td>
+           </tr>
+        </table>
+        
+        <table id="tableresults" style="width:40%; margin: auto; margin-top:2em;">
+            <tr>
+                <th>Trial</th>
+                <th>Well</th>
+                <th>Delay</th>
+                <th>Result</th>
+            </tr>
+            <tr>
+                <td>1</td>
+                <td>A</td>
+                <td>&#10003;</td>
+                <td>0</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>A</td>
+                <td>&#10007;</td>
+                <td>0</td>
+            </tr>
+        </table>
+    </div>
+    
+    <script type="text/javascript">
+    
+
+    
+    var task_index = 0;
+    
+    var well_was_b = [];
+    var well_selected_was_b = [];
+    var well_delay = [];
+    var well_error = [];
+    
+    
+    var selected_correct = 0;
+    var selected_error = 0;
+    
+    function BeginActivity()
+    {
+        well_delay[0] = 0;
+        well_was_b[0] = false;
+        task_index = 0;
+        
+        SwitchToMain();
+    }
+    
+    function Correct()
+    {
+        document.getElementById("main_display").style.display = 'none';
+        document.getElementById("confirm").style.display = 'block';
+        document.getElementById("_confirm").innerHTML = "Correct";
+        selected_correct = 1;
+    }
+    
+    function Wrong(type_of_error)
+    {
+        document.getElementById("main_display").style.display = 'none';
+        document.getElementById("confirm").style.display = 'block';
+        if (type_of_error == 1)
+            document.getElementById("_confirm").innerHTML = "Wrong";
+        else if (type_of_error == 2)
+            document.getElementById("_confirm").innerHTML = "None";
+        else if (type_of_error == 3)
+            document.getElementById("_confirm").innerHTML = "Both";
+        selected_correct = 0;
+        selected_error = type_of_error;
+    }
+    
+    function Confirm()
+    {
+        if (selected_correct)
+        {
+            well_selected_was_b[task_index] = well_was_b[task_index];
+            well_error[task_index] = 0;
+        }
+        else
+        {
+            well_selected_was_b[task_index] = !well_was_b[task_index];
+            well_error[task_index] = selected_error;
+        }
+        
+        // Set up the next task based on the current state.
+        
+        // default the state to duplicate.
+        well_delay[task_index+1] = well_delay[task_index];
+        well_was_b[task_index+1] = well_was_b[task_index];
+        
+        
+        var reversal_count = 0;
+        
+        // did we get two correct in a row, on the same well?
+        if (task_index >= 1 &&
+            well_was_b[task_index] == well_was_b[task_index-1] &&
+            well_selected_was_b[task_index] == well_was_b[task_index] &&
+            well_selected_was_b[task_index-1] == well_was_b[task_index-1])
+        {
+            // Is this the 6th reversal (5 + the intro)
+            for (var i = 1; i < task_index+1; i++)
+            {
+                if (well_was_b[i] == well_was_b[i-1] &&
+                    well_selected_was_b[i] == well_was_b[i] &&
+                    well_selected_was_b[i-1] == well_was_b[i-1])
+                {
+                    // this was a reversal.
+                    reversal_count++;
+                }
+            }
+
+            // Do a reversal.
+            well_was_b[task_index+1] = !well_was_b[task_index];
+            
+            // was this the first two on this well?
+            if (task_index >= 2 &&
+                well_was_b[task_index-2] != well_was_b[task_index-1])
+            {
+                // upgrade the delay
+                switch (well_delay[task_index])
+                {
+                    case 0: well_delay[task_index+1] = 3; break;
+                    case 3: well_delay[task_index+1] = 5; break;
+                    case 5: well_delay[task_index+1] = 10; break;
+                    case 10: well_delay[task_index+1] = 12; break;
+                }
+            }
+        }
+        
+        // did we get 5 wrong in a row (for initial) or
+        // 3 in a row for others.
+        if (task_index == 4 &&
+            well_selected_was_b[task_index] != well_was_b[task_index] && 
+            well_selected_was_b[task_index-1] != well_was_b[task_index-1] && 
+            well_selected_was_b[task_index-2] != well_was_b[task_index-2] &&
+            well_selected_was_b[task_index-3] != well_was_b[task_index-3] && 
+            well_selected_was_b[task_index-4] != well_was_b[task_index-4]
+            )
+        {
+            SwitchToEnd();
+            return;
+        }
+        else if (task_index >= 3 && 
+            well_selected_was_b[task_index] != well_was_b[task_index] && 
+            well_selected_was_b[task_index-1] != well_was_b[task_index-1] && 
+            well_selected_was_b[task_index-2] != well_was_b[task_index-2] &&
+            well_selected_was_b[task_index-3] == well_was_b[task_index-3]
+            )
+        {
+            SwitchToEnd();
+            return;
+        }
+        
+        if (reversal_count == 6)
+        {
+            SwitchToEnd();
+            return;
+        }
+        
+        
+        task_index++;
+        
+        SwitchToMain();
+    }
+    
+    function SwitchToEnd()
+    {
+        document.getElementById("begin_wrap").style.display = 'none';
+        document.getElementById("main_display").style.display = 'none';
+        document.getElementById("confirm").style.display = 'none';
+        document.getElementById("results").style.display = 'block';
+        
+        // setup the table for display.
+        document.getElementById("_famid").innerHTML = document.getElementById("_famidinput").value;
+        
+        var table = document.getElementById("tableresults");
+        while (table.rows.length > 1) // leave the header.
+        {
+            table.deleteRow(1);
+        }
+        
+        for (var i = 0; i < task_index+1; i++)
+        {
+            var row = table.insertRow(table.rows.length);
+            
+            var cell = row.insertCell(0);
+            cell.innerHTML = i+1;
+            
+            cell = row.insertCell(1);
+            cell.innerHTML = well_was_b[i] ? "B" : "A";
+            
+            cell = row.insertCell(2);
+            cell.innerHTML = well_delay[i];
+            
+            cell = row.insertCell(3);
+            if (well_selected_was_b[i] == undefined)
+                cell.innerHTML = "incomplete";
+            else if (well_selected_was_b[i] == well_was_b[i])
+            {
+                cell.innerHTML = "&#10003;";
+            }
+            else
+            {
+                if (well_error[i] == 1)
+                    cell.innerHTML = "Wrong";
+                else if (well_error[i] == 2)
+                    cell.innerHTML = "None";
+                else if (well_error[i] == 3)
+                    cell.innerHTML = "Both";
+            }
+            
+
+        }
+    }
+    
+    function SwitchToMain()
+    {
+        document.getElementById("results").style.display = 'none';
+        document.getElementById("begin_wrap").style.display = 'none';
+        document.getElementById("main_display").style.display = 'block';
+        document.getElementById("confirm").style.display = 'none';
+        
+        document.getElementById("_well").innerHTML = well_was_b[task_index] ? "B":"A";
+        document.getElementById("_delay").innerHTML = well_delay[task_index];
+    }
+
+    </script>
+ 
+</body>
+</html>
