@@ -39,6 +39,9 @@ namespace MidnightOilGames
                 trun = trun.Substring(0, trun.LastIndexOf('.'));
 
                 lblVideo.Text = trun;
+
+                button1.Enabled = false;
+                cmdExport.Enabled = true;
             }
         }
 
@@ -71,11 +74,6 @@ namespace MidnightOilGames
             pictureBox2.Invalidate();
         }
 
-        private void hScrollBar1_MouseCaptureChanged(object sender, EventArgs e)
-        {
-            
-        }
-
         private void hScrollBar1_Scroll(object sender, ScrollEventArgs e)
         {
             // if the cursor is beyond the end of the view range, catch up.
@@ -100,7 +98,7 @@ namespace MidnightOilGames
         static Color[] track_colors =
         {
             Color.Aquamarine,
-            Color.BlanchedAlmond,
+            Color.CornflowerBlue,
             Color.Tomato,
             Color.SteelBlue,
             Color.SeaGreen,
@@ -146,27 +144,6 @@ namespace MidnightOilGames
             new List<span>()
         };
 
-
-        
-
-        private void pictureBox1_Click(object sender, EventArgs e)
-        {            
-        }
-
-        private void pictureBox1_MouseClick(object sender, MouseEventArgs e)
-        {
-
-        }
-
-        private void pictureBox1_MouseDown(object sender, MouseEventArgs e)
-        {
-
-        }
-
-        private void pictureBox1_MouseUp(object sender, MouseEventArgs e)
-        {
-
-        }
 
         private void pictureBox1_Paint(object sender, PaintEventArgs e)
         {
@@ -320,6 +297,9 @@ namespace MidnightOilGames
                 e.Y - click_track * 18 > 16)
                 click_track = -1;
 
+            if (click_track >= track_count)
+                return;
+
             if (click_track != -1)
             {
                 for (int k = 0; k < track_spans[click_track].Count; k++)
@@ -463,13 +443,27 @@ namespace MidnightOilGames
             pictureBox2.Invalidate();
         }
 
-        private void cmdExport_Click(object sender, EventArgs e)
+        private bool do_save()
         {
+            if (txtCoder.Text.Length == 0)
+            {
+                MessageBox.Show("Please enter your coder id!");
+                return false;
+            }
+
             StringBuilder SB = new StringBuilder();
             SB.Append("<code>\r\n");
-            SB.Append("\t<version>1</version>\r\n");
+            SB.Append("\t<version>2</version>\r\n");
             SB.AppendFormat("\t<file>{0}</file>\r\n", lblVideo.Text);
             SB.AppendFormat("\t<coder>{0}</coder>\r\n", txtCoder.Text);
+            SB.AppendFormat("\t<flags sex_revealed=\"{0}\" still_abort=\"{1}\" paci_nat=\"{2}\" paci_free=\"{3}\" paci_still=\"{4}\" paci_reunion=\"{5}\"/>\r\n",
+                chkSexRevealed.Checked ? 1 : 0,
+                chkStillFaceAbort.Checked ? 1 : 0,
+                chkPaciNatPlay.Checked ? 1 : 0,
+                chkPaciFreePlay.Checked ? 1 : 0,
+                chkPaciStill.Checked ? 1 : 0,
+                chkPaciReunion.Checked ? 1 : 0
+                );
             SB.Append("\t<tracks>\r\n");
             for (int track = 0; track < track_count; track++)
             {
@@ -495,18 +489,39 @@ namespace MidnightOilGames
                 try
                 {
                     System.IO.File.WriteAllText(sfd.FileName, SB.ToString());
+                    return true;
                 }
                 catch
                 {
                     MessageBox.Show("Failed to save! Check target file isn't read only or network/disc isn't down.");
+                    return false;
                 }
             }
-
+            else
+                return false;
         }
 
-        private void pictureBox2_Click(object sender, EventArgs e)
+        private void cmdExport_Click(object sender, EventArgs e)
         {
+            do_save();
+        }
+        
 
+        private void Spanner_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (cmdExport.Enabled == false)
+                return; // no need to save if nothing loaded.
+
+            DialogResult result = MessageBox.Show("Save?", "Save?", MessageBoxButtons.YesNoCancel);
+            if (result == DialogResult.Yes)
+            {
+                if (do_save() == false)
+                {
+                    e.Cancel = true;
+                }
+            }
+            else if (result == DialogResult.Cancel)
+                e.Cancel = true;
         }
     }
 }

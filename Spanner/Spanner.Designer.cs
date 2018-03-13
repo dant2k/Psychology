@@ -61,6 +61,12 @@
             this.cmdExport = new System.Windows.Forms.Button();
             this.lblAdding = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
+            this.chkSexRevealed = new System.Windows.Forms.CheckBox();
+            this.chkStillFaceAbort = new System.Windows.Forms.CheckBox();
+            this.chkPaciNatPlay = new System.Windows.Forms.CheckBox();
+            this.chkPaciFreePlay = new System.Windows.Forms.CheckBox();
+            this.chkPaciStill = new System.Windows.Forms.CheckBox();
+            this.chkPaciReunion = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.Player)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
@@ -109,7 +115,6 @@
             this.hScrollBar1.TabIndex = 3;
             this.hScrollBar1.Scroll += new System.Windows.Forms.ScrollEventHandler(this.hScrollBar1_Scroll);
             this.hScrollBar1.ValueChanged += new System.EventHandler(this.hScrollBar1_ValueChanged);
-            this.hScrollBar1.MouseCaptureChanged += new System.EventHandler(this.hScrollBar1_MouseCaptureChanged);
             // 
             // pictureBox1
             // 
@@ -120,11 +125,7 @@
             this.pictureBox1.Size = new System.Drawing.Size(607, 18);
             this.pictureBox1.TabIndex = 4;
             this.pictureBox1.TabStop = false;
-            this.pictureBox1.Click += new System.EventHandler(this.pictureBox1_Click);
             this.pictureBox1.Paint += new System.Windows.Forms.PaintEventHandler(this.pictureBox1_Paint);
-            this.pictureBox1.MouseClick += new System.Windows.Forms.MouseEventHandler(this.pictureBox1_MouseClick);
-            this.pictureBox1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pictureBox1_MouseDown);
-            this.pictureBox1.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pictureBox1_MouseUp);
             // 
             // pictureBox2
             // 
@@ -137,7 +138,6 @@
             this.pictureBox2.Size = new System.Drawing.Size(607, 168);
             this.pictureBox2.TabIndex = 5;
             this.pictureBox2.TabStop = false;
-            this.pictureBox2.Click += new System.EventHandler(this.pictureBox2_Click);
             this.pictureBox2.Paint += new System.Windows.Forms.PaintEventHandler(this.pictureBox2_Paint);
             this.pictureBox2.MouseClick += new System.Windows.Forms.MouseEventHandler(this.pictureBox2_MouseClick);
             // 
@@ -365,6 +365,7 @@
             // cmdExport
             // 
             this.cmdExport.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.cmdExport.Enabled = false;
             this.cmdExport.Location = new System.Drawing.Point(740, 78);
             this.cmdExport.Name = "cmdExport";
             this.cmdExport.Size = new System.Drawing.Size(75, 23);
@@ -392,13 +393,79 @@
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(63, 13);
             this.label5.TabIndex = 24;
-            this.label5.Text = "Version: 1.0";
+            this.label5.Text = "Version: 1.1";
+            // 
+            // chkSexRevealed
+            // 
+            this.chkSexRevealed.AutoSize = true;
+            this.chkSexRevealed.Location = new System.Drawing.Point(742, 157);
+            this.chkSexRevealed.Name = "chkSexRevealed";
+            this.chkSexRevealed.Size = new System.Drawing.Size(93, 17);
+            this.chkSexRevealed.TabIndex = 25;
+            this.chkSexRevealed.Text = "Sex Revealed";
+            this.chkSexRevealed.UseVisualStyleBackColor = true;
+            // 
+            // chkStillFaceAbort
+            // 
+            this.chkStillFaceAbort.AutoSize = true;
+            this.chkStillFaceAbort.Location = new System.Drawing.Point(742, 181);
+            this.chkStillFaceAbort.Name = "chkStillFaceAbort";
+            this.chkStillFaceAbort.Size = new System.Drawing.Size(129, 17);
+            this.chkStillFaceAbort.TabIndex = 26;
+            this.chkStillFaceAbort.Text = "Still Face Ended Early";
+            this.chkStillFaceAbort.UseVisualStyleBackColor = true;
+            // 
+            // chkPaciNatPlay
+            // 
+            this.chkPaciNatPlay.AutoSize = true;
+            this.chkPaciNatPlay.Location = new System.Drawing.Point(742, 205);
+            this.chkPaciNatPlay.Name = "chkPaciNatPlay";
+            this.chkPaciNatPlay.Size = new System.Drawing.Size(128, 17);
+            this.chkPaciNatPlay.TabIndex = 27;
+            this.chkPaciNatPlay.Text = "Paci: Naturalistic Play";
+            this.chkPaciNatPlay.UseVisualStyleBackColor = true;
+            // 
+            // chkPaciFreePlay
+            // 
+            this.chkPaciFreePlay.AutoSize = true;
+            this.chkPaciFreePlay.Location = new System.Drawing.Point(742, 229);
+            this.chkPaciFreePlay.Name = "chkPaciFreePlay";
+            this.chkPaciFreePlay.Size = new System.Drawing.Size(97, 17);
+            this.chkPaciFreePlay.TabIndex = 28;
+            this.chkPaciFreePlay.Text = "Paci: Free Play";
+            this.chkPaciFreePlay.UseVisualStyleBackColor = true;
+            // 
+            // chkPaciStill
+            // 
+            this.chkPaciStill.AutoSize = true;
+            this.chkPaciStill.Location = new System.Drawing.Point(742, 253);
+            this.chkPaciStill.Name = "chkPaciStill";
+            this.chkPaciStill.Size = new System.Drawing.Size(96, 17);
+            this.chkPaciStill.TabIndex = 29;
+            this.chkPaciStill.Text = "Paci: Still Face";
+            this.chkPaciStill.UseVisualStyleBackColor = true;
+            // 
+            // chkPaciReunion
+            // 
+            this.chkPaciReunion.AutoSize = true;
+            this.chkPaciReunion.Location = new System.Drawing.Point(740, 277);
+            this.chkPaciReunion.Name = "chkPaciReunion";
+            this.chkPaciReunion.Size = new System.Drawing.Size(93, 17);
+            this.chkPaciReunion.TabIndex = 30;
+            this.chkPaciReunion.Text = "Paci: Reunion";
+            this.chkPaciReunion.UseVisualStyleBackColor = true;
             // 
             // Spanner
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(933, 674);
+            this.Controls.Add(this.chkPaciReunion);
+            this.Controls.Add(this.chkPaciStill);
+            this.Controls.Add(this.chkPaciFreePlay);
+            this.Controls.Add(this.chkPaciNatPlay);
+            this.Controls.Add(this.chkStillFaceAbort);
+            this.Controls.Add(this.chkSexRevealed);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.lblAdding);
             this.Controls.Add(this.cmdExport);
@@ -426,6 +493,7 @@
             this.MinimumSize = new System.Drawing.Size(949, 713);
             this.Name = "Spanner";
             this.Text = "Spanner";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Spanner_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.Form1_KeyDown);
             this.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.Form1_KeyPress);
@@ -474,6 +542,12 @@
         private System.Windows.Forms.Button cmdExport;
         private System.Windows.Forms.Label lblAdding;
         private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.CheckBox chkSexRevealed;
+        private System.Windows.Forms.CheckBox chkStillFaceAbort;
+        private System.Windows.Forms.CheckBox chkPaciNatPlay;
+        private System.Windows.Forms.CheckBox chkPaciFreePlay;
+        private System.Windows.Forms.CheckBox chkPaciStill;
+        private System.Windows.Forms.CheckBox chkPaciReunion;
     }
 }
 
