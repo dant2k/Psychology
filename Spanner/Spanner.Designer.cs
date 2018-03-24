@@ -84,6 +84,7 @@
             this.Player.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("Player.OcxState")));
             this.Player.Size = new System.Drawing.Size(640, 384);
             this.Player.TabIndex = 0;
+            this.Player.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.Player_PreviewKeyDown);
             // 
             // button1
             // 
@@ -376,6 +377,7 @@
             // 
             // lblAdding
             // 
+            this.lblAdding.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.lblAdding.AutoSize = true;
             this.lblAdding.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblAdding.Location = new System.Drawing.Point(739, 481);
@@ -393,10 +395,11 @@
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(63, 13);
             this.label5.TabIndex = 24;
-            this.label5.Text = "Version: 1.1";
+            this.label5.Text = "Version: 1.2";
             // 
             // chkSexRevealed
             // 
+            this.chkSexRevealed.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.chkSexRevealed.AutoSize = true;
             this.chkSexRevealed.Location = new System.Drawing.Point(742, 157);
             this.chkSexRevealed.Name = "chkSexRevealed";
@@ -407,6 +410,7 @@
             // 
             // chkStillFaceAbort
             // 
+            this.chkStillFaceAbort.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.chkStillFaceAbort.AutoSize = true;
             this.chkStillFaceAbort.Location = new System.Drawing.Point(742, 181);
             this.chkStillFaceAbort.Name = "chkStillFaceAbort";
@@ -417,6 +421,7 @@
             // 
             // chkPaciNatPlay
             // 
+            this.chkPaciNatPlay.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.chkPaciNatPlay.AutoSize = true;
             this.chkPaciNatPlay.Location = new System.Drawing.Point(742, 205);
             this.chkPaciNatPlay.Name = "chkPaciNatPlay";
@@ -427,6 +432,7 @@
             // 
             // chkPaciFreePlay
             // 
+            this.chkPaciFreePlay.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.chkPaciFreePlay.AutoSize = true;
             this.chkPaciFreePlay.Location = new System.Drawing.Point(742, 229);
             this.chkPaciFreePlay.Name = "chkPaciFreePlay";
@@ -437,6 +443,7 @@
             // 
             // chkPaciStill
             // 
+            this.chkPaciStill.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.chkPaciStill.AutoSize = true;
             this.chkPaciStill.Location = new System.Drawing.Point(742, 253);
             this.chkPaciStill.Name = "chkPaciStill";
@@ -447,6 +454,7 @@
             // 
             // chkPaciReunion
             // 
+            this.chkPaciReunion.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.chkPaciReunion.AutoSize = true;
             this.chkPaciReunion.Location = new System.Drawing.Point(740, 277);
             this.chkPaciReunion.Name = "chkPaciReunion";

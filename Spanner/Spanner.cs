@@ -177,30 +177,35 @@ namespace MidnightOilGames
             }
         }
 
+        private void f1_hit()
+        {
+            if (new_span_start == -1)
+            {
+                new_span_start = hScrollBar1.Value;
+                lblAdding.Visible = true;
+            }
+            else
+            {
+                lblAdding.Visible = false;
+                if (hScrollBar1.Value > new_span_start)
+                {
+                    span new_span = new span();
+                    new_span.start = new_span_start;
+                    new_span.end = hScrollBar1.Value;
+                    new_span.track = selected_track;
+                    track_spans[selected_track].Add(new_span);
+                }
+                new_span_start = -1;
+            }
+        }
+
         private void Form1_KeyUp(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Space)
                 e.Handled = true;
             if (e.KeyCode == Keys.F1)
             {
-                if (new_span_start == -1)
-                {
-                    new_span_start = hScrollBar1.Value;
-                    lblAdding.Visible = true;
-                }
-                else
-                {
-                    lblAdding.Visible = false;
-                    if (hScrollBar1.Value > new_span_start)
-                    {
-                        span new_span = new span();
-                        new_span.start = new_span_start;
-                        new_span.end = hScrollBar1.Value;
-                        new_span.track = selected_track;
-                        track_spans[selected_track].Add(new_span);
-                    }
-                    new_span_start = -1;
-                }
+                f1_hit();
             }
 
         }
@@ -522,6 +527,12 @@ namespace MidnightOilGames
             }
             else if (result == DialogResult.Cancel)
                 e.Cancel = true;
+        }
+
+        private void Player_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
+        {
+            if (e.KeyCode == Keys.F1)
+                f1_hit();
         }
     }
 }
