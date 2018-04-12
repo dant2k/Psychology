@@ -26,6 +26,7 @@
     Version History:
     (Update version in source code line ~136 when changing)
     
+    1.00 - Apr 11, 2018 - Delay highlights when nonzero.
     .90 - Feb 23, 2018 - pre-release for testing.
     
     The latest version of this file can be found at:
@@ -109,7 +110,7 @@ table tr:nth-child(even) td
 {
     background-color: white;
     border: 0px solid black;
-    padding-top:1em;
+    padding-top:0em;
     text-align:left;
     overflow:hidden;
     white-space:nowrap;
@@ -133,7 +134,7 @@ table tr:nth-child(even) td
     A<span style="text-decoration:overline">B</span>
     </div>
     <div style="color: silver; text-align:center; font-size: 2vw;"/>
-    Version: .90
+    Version: 1.00
     </div>
         
     
@@ -154,8 +155,8 @@ table tr:nth-child(even) td
           </tr>
         </table>
         <table class="dot-table">
-          <tr style="margin-top:1em">
-            <td>
+          <tr style="margin-top:em">
+            <td id="_delay_title" >
                Delay
             </td>
             <td id="_delay" style="text-align:right;">
@@ -439,6 +440,11 @@ table tr:nth-child(even) td
         
         document.getElementById("_well").innerHTML = well_was_b[task_index] ? "B":"A";
         document.getElementById("_delay").innerHTML = well_delay[task_index];
+        if (well_delay[task_index] != 0)
+        {
+            document.getElementById("_delay_title").style = "background-color:yellow";
+            document.getElementById("_delay").style = "text-align:right;background-color:yellow;"
+        }
     }
 
     </script>
