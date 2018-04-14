@@ -684,6 +684,17 @@ namespace Forge
                 }
                 throw new Exception();
             }
+            public static string get_task_abbrev(TaskType task)
+            {
+                switch (task)
+                {
+                    case TaskType.eNaturalPlay: return "np";
+                    case TaskType.eFreePlay: return "fp";
+                    case TaskType.eReunion: return "re";
+                    case TaskType.eStillFace: return "sf";
+                }
+                throw new Exception();
+            }
             public static string get_measure_str(MeasureType measure)
             {
                 switch (measure)
@@ -696,7 +707,18 @@ namespace Forge
                 }
                 throw new Exception();
             }
-
+            public static string get_measure_abbrev(MeasureType measure)
+            {
+                switch (measure)
+                {
+                    case MeasureType.eBabyInvis: return "inv";
+                    case MeasureType.eEscape: return "esc";
+                    case MeasureType.eMother: return "mom";
+                    case MeasureType.eObject: return "obj";
+                    case MeasureType.eSoothe: return "soo";
+                }
+                throw new Exception();
+            }
             public void run_measure(TimeSpan epoch, List<bool> epoch_markings, List<TimeSpan> codes)
             {
                 bool epoch_marked = false;
@@ -1115,7 +1137,7 @@ namespace Forge
                 {
                     if (measures[i] == MeasureType.eBabyInvis)
                         continue; // not a data measure.
-                    SB.AppendFormat("{0}_{1}_{2}", Reliability.get_task_str(tasks[t]), Reliability.get_measure_str(measures[i]), DetectedTimepoint);
+                    SB.AppendFormat("oi{2}{0}{1}", Reliability.get_task_abbrev(tasks[t]), Reliability.get_measure_abbrev(measures[i]), DetectedTimepoint.Substring(1));
                     if (t != tasks.Length - 1 || i != measures.Length - 1)
                         SB.Append(",");
                 }
