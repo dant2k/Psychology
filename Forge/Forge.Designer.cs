@@ -33,7 +33,6 @@
             this.lstVideos = new System.Windows.Forms.ListView();
             this.chVideo = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.chCoder = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.chError = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.chAccept = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.chNeedsBaseline = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.btnLoad = new System.Windows.Forms.Button();
@@ -66,6 +65,8 @@
             this.btnExportData = new System.Windows.Forms.Button();
             this.label13 = new System.Windows.Forms.Label();
             this.lblTimepoint = new System.Windows.Forms.Label();
+            this.lblError = new System.Windows.Forms.Label();
+            this.lblErrorCount = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // label1
@@ -88,15 +89,17 @@
             // 
             // lstVideos
             // 
+            this.lstVideos.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.lstVideos.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.chVideo,
             this.chCoder,
-            this.chError,
             this.chAccept,
             this.chNeedsBaseline});
-            this.lstVideos.Location = new System.Drawing.Point(15, 77);
+            this.lstVideos.Location = new System.Drawing.Point(15, 98);
             this.lstVideos.Name = "lstVideos";
-            this.lstVideos.Size = new System.Drawing.Size(509, 309);
+            this.lstVideos.Size = new System.Drawing.Size(513, 184);
             this.lstVideos.TabIndex = 2;
             this.lstVideos.UseCompatibleStateImageBehavior = false;
             this.lstVideos.View = System.Windows.Forms.View.Details;
@@ -112,10 +115,6 @@
             // 
             this.chCoder.Text = "Coder";
             // 
-            // chError
-            // 
-            this.chError.Text = "Error";
-            // 
             // chAccept
             // 
             this.chAccept.Text = "Accepted";
@@ -127,7 +126,8 @@
             // 
             // btnLoad
             // 
-            this.btnLoad.Location = new System.Drawing.Point(533, 12);
+            this.btnLoad.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnLoad.Location = new System.Drawing.Point(537, 12);
             this.btnLoad.Name = "btnLoad";
             this.btnLoad.Size = new System.Drawing.Size(75, 23);
             this.btnLoad.TabIndex = 3;
@@ -137,8 +137,9 @@
             // 
             // label3
             // 
+            this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(14, 376);
+            this.label3.Location = new System.Drawing.Point(14, 285);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(37, 13);
             this.label3.TabIndex = 4;
@@ -146,16 +147,19 @@
             // 
             // lstErrors
             // 
+            this.lstErrors.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.lstErrors.FormattingEnabled = true;
-            this.lstErrors.Location = new System.Drawing.Point(15, 392);
+            this.lstErrors.Location = new System.Drawing.Point(15, 301);
             this.lstErrors.Name = "lstErrors";
-            this.lstErrors.Size = new System.Drawing.Size(509, 43);
+            this.lstErrors.Size = new System.Drawing.Size(513, 108);
             this.lstErrors.TabIndex = 5;
             // 
             // label4
             // 
+            this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(12, 438);
+            this.label4.Location = new System.Drawing.Point(12, 412);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(104, 13);
             this.label4.TabIndex = 6;
@@ -163,8 +167,9 @@
             // 
             // label5
             // 
+            this.label5.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(50, 455);
+            this.label5.Location = new System.Drawing.Point(50, 429);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(64, 13);
             this.label5.TabIndex = 7;
@@ -172,8 +177,9 @@
             // 
             // label6
             // 
+            this.label6.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(124, 455);
+            this.label6.Location = new System.Drawing.Point(124, 429);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(51, 13);
             this.label6.TabIndex = 8;
@@ -181,8 +187,9 @@
             // 
             // label7
             // 
+            this.label7.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(198, 455);
+            this.label7.Location = new System.Drawing.Point(198, 429);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(50, 13);
             this.label7.TabIndex = 9;
@@ -190,8 +197,9 @@
             // 
             // label8
             // 
+            this.label8.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(274, 455);
+            this.label8.Location = new System.Drawing.Point(274, 429);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(47, 13);
             this.label8.TabIndex = 10;
@@ -199,7 +207,8 @@
             // 
             // txtNatPlayStart
             // 
-            this.txtNatPlayStart.Location = new System.Drawing.Point(53, 471);
+            this.txtNatPlayStart.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.txtNatPlayStart.Location = new System.Drawing.Point(53, 445);
             this.txtNatPlayStart.Name = "txtNatPlayStart";
             this.txtNatPlayStart.Size = new System.Drawing.Size(68, 20);
             this.txtNatPlayStart.TabIndex = 11;
@@ -207,7 +216,8 @@
             // 
             // txtNatPlayEnd
             // 
-            this.txtNatPlayEnd.Location = new System.Drawing.Point(53, 497);
+            this.txtNatPlayEnd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.txtNatPlayEnd.Location = new System.Drawing.Point(53, 471);
             this.txtNatPlayEnd.Name = "txtNatPlayEnd";
             this.txtNatPlayEnd.Size = new System.Drawing.Size(68, 20);
             this.txtNatPlayEnd.TabIndex = 12;
@@ -215,7 +225,8 @@
             // 
             // txtFreePlayStart
             // 
-            this.txtFreePlayStart.Location = new System.Drawing.Point(127, 471);
+            this.txtFreePlayStart.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.txtFreePlayStart.Location = new System.Drawing.Point(127, 445);
             this.txtFreePlayStart.Name = "txtFreePlayStart";
             this.txtFreePlayStart.Size = new System.Drawing.Size(67, 20);
             this.txtFreePlayStart.TabIndex = 13;
@@ -223,7 +234,8 @@
             // 
             // txtFreePlayEnd
             // 
-            this.txtFreePlayEnd.Location = new System.Drawing.Point(127, 497);
+            this.txtFreePlayEnd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.txtFreePlayEnd.Location = new System.Drawing.Point(127, 471);
             this.txtFreePlayEnd.Name = "txtFreePlayEnd";
             this.txtFreePlayEnd.Size = new System.Drawing.Size(67, 20);
             this.txtFreePlayEnd.TabIndex = 14;
@@ -231,7 +243,8 @@
             // 
             // txtStillEnd
             // 
-            this.txtStillEnd.Location = new System.Drawing.Point(201, 497);
+            this.txtStillEnd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.txtStillEnd.Location = new System.Drawing.Point(201, 471);
             this.txtStillEnd.Name = "txtStillEnd";
             this.txtStillEnd.Size = new System.Drawing.Size(67, 20);
             this.txtStillEnd.TabIndex = 16;
@@ -239,7 +252,8 @@
             // 
             // txtStillStart
             // 
-            this.txtStillStart.Location = new System.Drawing.Point(201, 471);
+            this.txtStillStart.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.txtStillStart.Location = new System.Drawing.Point(201, 445);
             this.txtStillStart.Name = "txtStillStart";
             this.txtStillStart.Size = new System.Drawing.Size(67, 20);
             this.txtStillStart.TabIndex = 15;
@@ -247,7 +261,8 @@
             // 
             // txtReunionEnd
             // 
-            this.txtReunionEnd.Location = new System.Drawing.Point(277, 497);
+            this.txtReunionEnd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.txtReunionEnd.Location = new System.Drawing.Point(277, 471);
             this.txtReunionEnd.Name = "txtReunionEnd";
             this.txtReunionEnd.Size = new System.Drawing.Size(67, 20);
             this.txtReunionEnd.TabIndex = 18;
@@ -255,7 +270,8 @@
             // 
             // txtReunionStart
             // 
-            this.txtReunionStart.Location = new System.Drawing.Point(277, 471);
+            this.txtReunionStart.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.txtReunionStart.Location = new System.Drawing.Point(277, 445);
             this.txtReunionStart.Name = "txtReunionStart";
             this.txtReunionStart.Size = new System.Drawing.Size(67, 20);
             this.txtReunionStart.TabIndex = 17;
@@ -263,7 +279,8 @@
             // 
             // btnAccepted
             // 
-            this.btnAccepted.Location = new System.Drawing.Point(420, 445);
+            this.btnAccepted.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnAccepted.Location = new System.Drawing.Point(424, 419);
             this.btnAccepted.Name = "btnAccepted";
             this.btnAccepted.Size = new System.Drawing.Size(104, 23);
             this.btnAccepted.TabIndex = 19;
@@ -309,8 +326,9 @@
             // 
             // label2
             // 
+            this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(13, 477);
+            this.label2.Location = new System.Drawing.Point(13, 451);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(29, 13);
             this.label2.TabIndex = 24;
@@ -318,8 +336,9 @@
             // 
             // label11
             // 
+            this.label11.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(14, 501);
+            this.label11.Location = new System.Drawing.Point(14, 475);
             this.label11.Name = "label11";
             this.label11.Size = new System.Drawing.Size(26, 13);
             this.label11.TabIndex = 25;
@@ -327,15 +346,17 @@
             // 
             // txtEpoch
             // 
-            this.txtEpoch.Location = new System.Drawing.Point(558, 501);
+            this.txtEpoch.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtEpoch.Location = new System.Drawing.Point(562, 475);
             this.txtEpoch.Name = "txtEpoch";
             this.txtEpoch.Size = new System.Drawing.Size(50, 20);
             this.txtEpoch.TabIndex = 26;
             // 
             // label12
             // 
+            this.label12.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(511, 504);
+            this.label12.Location = new System.Drawing.Point(559, 459);
             this.label12.Name = "label12";
             this.label12.Size = new System.Drawing.Size(41, 13);
             this.label12.TabIndex = 27;
@@ -343,7 +364,8 @@
             // 
             // btnReliability
             // 
-            this.btnReliability.Location = new System.Drawing.Point(533, 340);
+            this.btnReliability.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnReliability.Location = new System.Drawing.Point(537, 314);
             this.btnReliability.Name = "btnReliability";
             this.btnReliability.Size = new System.Drawing.Size(75, 49);
             this.btnReliability.TabIndex = 28;
@@ -353,7 +375,8 @@
             // 
             // btnSetBaseline
             // 
-            this.btnSetBaseline.Location = new System.Drawing.Point(420, 477);
+            this.btnSetBaseline.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnSetBaseline.Location = new System.Drawing.Point(424, 451);
             this.btnSetBaseline.Name = "btnSetBaseline";
             this.btnSetBaseline.Size = new System.Drawing.Size(104, 23);
             this.btnSetBaseline.TabIndex = 29;
@@ -363,7 +386,8 @@
             // 
             // btnExportData
             // 
-            this.btnExportData.Location = new System.Drawing.Point(535, 397);
+            this.btnExportData.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnExportData.Location = new System.Drawing.Point(539, 371);
             this.btnExportData.Name = "btnExportData";
             this.btnExportData.Size = new System.Drawing.Size(72, 53);
             this.btnExportData.TabIndex = 30;
@@ -388,11 +412,31 @@
             this.lblTimepoint.Size = new System.Drawing.Size(0, 13);
             this.lblTimepoint.TabIndex = 32;
             // 
+            // lblError
+            // 
+            this.lblError.AutoSize = true;
+            this.lblError.Location = new System.Drawing.Point(16, 78);
+            this.lblError.Name = "lblError";
+            this.lblError.Size = new System.Drawing.Size(63, 13);
+            this.lblError.TabIndex = 33;
+            this.lblError.Text = "Error Count:";
+            // 
+            // lblErrorCount
+            // 
+            this.lblErrorCount.AutoSize = true;
+            this.lblErrorCount.Location = new System.Drawing.Point(127, 77);
+            this.lblErrorCount.Name = "lblErrorCount";
+            this.lblErrorCount.Size = new System.Drawing.Size(13, 13);
+            this.lblErrorCount.TabIndex = 34;
+            this.lblErrorCount.Text = "0";
+            // 
             // Forge
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(620, 530);
+            this.ClientSize = new System.Drawing.Size(624, 504);
+            this.Controls.Add(this.lblErrorCount);
+            this.Controls.Add(this.lblError);
             this.Controls.Add(this.lblTimepoint);
             this.Controls.Add(this.label13);
             this.Controls.Add(this.btnExportData);
@@ -426,6 +470,7 @@
             this.Controls.Add(this.lstVideos);
             this.Controls.Add(this.lblPath);
             this.Controls.Add(this.label1);
+            this.MinimumSize = new System.Drawing.Size(640, 543);
             this.Name = "Forge";
             this.Text = "Forge";
             this.Load += new System.EventHandler(this.Forge_Load);
@@ -443,7 +488,6 @@
         private System.Windows.Forms.ColumnHeader chCoder;
         private System.Windows.Forms.ColumnHeader chAccept;
         private System.Windows.Forms.Button btnLoad;
-        private System.Windows.Forms.ColumnHeader chError;
         private System.Windows.Forms.ColumnHeader chNeedsBaseline;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.ListBox lstErrors;
@@ -474,6 +518,8 @@
         private System.Windows.Forms.Button btnExportData;
         private System.Windows.Forms.Label label13;
         private System.Windows.Forms.Label lblTimepoint;
+        private System.Windows.Forms.Label lblError;
+        private System.Windows.Forms.Label lblErrorCount;
     }
 }
 

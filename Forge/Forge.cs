@@ -19,11 +19,15 @@ namespace Forge
             InitializeComponent();
         }
 
-        public class TimeSpan
+        public class TimeSpan : IComparable
         {
             public int start_sec = 0;
             public int end_sec = 0;
 
+            public int length()
+            {
+                return end_sec - start_sec;
+            }
             public bool overlaps(TimeSpan other)
             {
                 if (other.end_sec <= start_sec)
@@ -31,6 +35,22 @@ namespace Forge
                 if (other.start_sec >= end_sec)
                     return false;
                 return true;
+            }
+            public static TimeSpan union(TimeSpan A, TimeSpan B)
+            {
+                TimeSpan ret = new TimeSpan();
+                ret.start_sec = Math.Min(A.start_sec, B.start_sec);
+                ret.end_sec = Math.Max(A.end_sec, B.end_sec);
+                return ret;
+            }
+            public int CompareTo(object other)
+            {
+                return start_sec.CompareTo(((TimeSpan)other).start_sec);
+            }
+            public void CopyFrom(TimeSpan other)
+            {
+                start_sec = other.start_sec;
+                end_sec = other.end_sec;
             }
         };
 
@@ -82,15 +102,51 @@ namespace Forge
             public void parse_task(string task_name, TimeSpan output_span)
             {
                 XmlNode task_1 = xml.SelectSingleNode("/code/tracks/track[@name=\"" + task_name + "\"]");
+                XmlNodeList spans = task_1.SelectNodes("span");
 
-                if (task_1.ChildNodes.Count > 1)
+                List<TimeSpan> parsed_spans = new List<TimeSpan>();
+                foreach (XmlNode span in spans)
                 {
-                    errors.Add(task_name + " has too many spans");
+                    TimeSpan new_span = new TimeSpan();
+                    new_span.start_sec = Int32.Parse(span.SelectSingleNode("@start").InnerText);
+                    new_span.end_sec = Int32.Parse(span.SelectSingleNode("@end").InnerText);
+                    parsed_spans.Add(new_span);
                 }
-                else if (task_1.ChildNodes.Count == 1)
+
+                if (parsed_spans.Count == 0)
                 {
-                    output_span.start_sec = Int32.Parse(task_1.SelectSingleNode("span/@start").InnerText);
-                    output_span.end_sec = Int32.Parse(task_1.SelectSingleNode("span/@end").InnerText);
+                    errors.Add(video.video + " - " + coder + " - " + task_name + " has no spans.");
+                    return;
+                }
+
+                //
+                // Strictly speaking, only one span can exist. However due to the UI in Spanner,
+                // we could get hidden spans "behind" another, or we can have extensions that overlap
+                // or are adjacent. So we only error if there distinct spans.
+                //
+                // In order to make sure that the spans can join without any ordering nonsense, we sort
+                // by start time.
+                //
+                parsed_spans.Sort();
+
+                //
+                // Now we try to join them. The only way we fail is if the union of the
+                // timespans _adds_ time to the total of both - which would means there's
+                // a space between them that got added by the union operation.
+                //
+                output_span.CopyFrom(parsed_spans[0]);
+                for (int i = 1; i < parsed_spans.Count; i++)
+                {
+                    TimeSpan U = TimeSpan.union(output_span, parsed_spans[i]);
+                    if (U.length() > output_span.length() + parsed_spans[i].length())
+                    {
+                        // failure mode - some space was added.
+                        errors.Add(video.video + " - " + coder + " - " + task_name + " has more than one distinct span.");
+                        return;
+                    }
+
+                    // otherwise, we just use the union in case we got extensions or whatnot.
+                    output_span.CopyFrom(U);
                 }
             }
 
@@ -132,6 +188,7 @@ namespace Forge
 
         };
 
+        List<CodFile> ErrorFiles = new List<CodFile>();
         Dictionary<string, CodVideo> Videos = new Dictionary<string, CodVideo>();
         public CachedDecisions Decisions = new CachedDecisions();
         string DetectedTimepoint;
@@ -303,10 +360,31 @@ namespace Forge
                 codfile.parse_spans("Orient: Mother", codfile.orient_mother);
                 codfile.parse_spans("Self Soothe", codfile.self_soothe);
                 codfile.parse_spans("Escape", codfile.escape);
+
+                if (codfile.errors.Count != 0)
+                {
+                    // remove from the videos list and add to the errors list.
+                    video.codes.Remove(codfile);
+                    ErrorFiles.Add(codfile);
+                }
             }
 
             lblVideoCount.Text = Videos.Count.ToString();
             lblFileCount.Text = file_count.ToString();
+            lblErrorCount.Text = ErrorFiles.Count.ToString();
+            if (ErrorFiles.Count != 0)
+            {
+                lblErrorCount.ForeColor = Color.Red;
+                lblError.ForeColor = Color.Red;
+            }
+
+            foreach (CodFile file in ErrorFiles)
+            {
+                foreach (string error in file.errors)
+                {
+                    lstErrors.Items.Add(error);
+                }
+            }
 
             foreach (KeyValuePair<string, CodVideo> pair in Videos)
             {
@@ -314,35 +392,29 @@ namespace Forge
 
                 foreach (CodFile file in video.codes)
                 {
-                    bool has_error = file.errors.Count != 0;
-
-                    string[] entries = new string[5];
-                    if (has_error)
-                        entries[2] = "YES";
-                    else
-                        entries[2] = "";
+                    string[] entries = new string[4];
 
                     entries[0] = video.video;
                     entries[1] = file.coder;
 
-                    entries[3] = "";
+                    entries[2] = "";
                     if (video.codes.Count > 1)
                     {
                         if (Decisions.accepted_coders.ContainsKey(video.video) &&
                             Decisions.accepted_coders[video.video] == file.coder)
-                            entries[3] = "YES";
+                            entries[2] = "YES";
                         else
-                            entries[3] = "no";
+                            entries[2] = "no";
 
                     }
 
-                    entries[4] = "";
+                    entries[3] = "";
                     if (video.codes.Count > 1)
                     {
                         if (Decisions.reliability_baselines.ContainsKey(video.video))
-                            entries[4] = "no";
+                            entries[3] = "no";
                         else
-                            entries[4] = "YES";
+                            entries[3] = "YES";
                     }
 
                     ListViewItem item = new ListViewItem(entries);
@@ -364,17 +436,17 @@ namespace Forge
                     {
                         if (Decisions.accepted_coders.ContainsKey(video.video) &&
                             Decisions.accepted_coders[video.video] == file.coder)
-                            file.list_view_item.SubItems[3].Text = "YES";
+                            file.list_view_item.SubItems[2].Text = "YES";
                         else
-                            file.list_view_item.SubItems[3].Text = "no";
+                            file.list_view_item.SubItems[2].Text = "no";
                     }
 
                     if (video.codes.Count > 1)
                     {
                         if (Decisions.reliability_baselines.ContainsKey(video.video))
-                            file.list_view_item.SubItems[4].Text = "no";
+                            file.list_view_item.SubItems[3].Text = "no";
                         else
-                            file.list_view_item.SubItems[4].Text = "YES";
+                            file.list_view_item.SubItems[3].Text = "YES";
                     }
                 }
             }
