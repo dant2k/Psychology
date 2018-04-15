@@ -67,6 +67,7 @@
             this.lblTimepoint = new System.Windows.Forms.Label();
             this.lblError = new System.Windows.Forms.Label();
             this.lblErrorCount = new System.Windows.Forms.Label();
+            this.label14 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // label1
@@ -430,11 +431,22 @@
             this.lblErrorCount.TabIndex = 34;
             this.lblErrorCount.Text = "0";
             // 
+            // label14
+            // 
+            this.label14.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.label14.AutoSize = true;
+            this.label14.Location = new System.Drawing.Point(465, 78);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(63, 13);
+            this.label14.TabIndex = 35;
+            this.label14.Text = "Version: .90";
+            // 
             // Forge
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(624, 504);
+            this.Controls.Add(this.label14);
             this.Controls.Add(this.lblErrorCount);
             this.Controls.Add(this.lblError);
             this.Controls.Add(this.lblTimepoint);
@@ -520,6 +532,7 @@
         private System.Windows.Forms.Label lblTimepoint;
         private System.Windows.Forms.Label lblError;
         private System.Windows.Forms.Label lblErrorCount;
+        private System.Windows.Forms.Label label14;
     }
 }
 
