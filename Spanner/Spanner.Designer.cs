@@ -67,6 +67,7 @@
             this.chkPaciFreePlay = new System.Windows.Forms.CheckBox();
             this.chkPaciStill = new System.Windows.Forms.CheckBox();
             this.chkPaciReunion = new System.Windows.Forms.CheckBox();
+            this.btnLoadCod = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.Player)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
@@ -92,7 +93,7 @@
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(70, 23);
             this.button1.TabIndex = 1;
-            this.button1.Text = "Load";
+            this.button1.Text = "Load Video";
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
@@ -395,7 +396,7 @@
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(63, 13);
             this.label5.TabIndex = 24;
-            this.label5.Text = "Version: 1.2";
+            this.label5.Text = "Version: 1.3";
             // 
             // chkSexRevealed
             // 
@@ -463,11 +464,23 @@
             this.chkPaciReunion.Text = "Paci: Reunion";
             this.chkPaciReunion.UseVisualStyleBackColor = true;
             // 
+            // btnLoadCod
+            // 
+            this.btnLoadCod.Enabled = false;
+            this.btnLoadCod.Location = new System.Drawing.Point(15, 368);
+            this.btnLoadCod.Name = "btnLoadCod";
+            this.btnLoadCod.Size = new System.Drawing.Size(70, 45);
+            this.btnLoadCod.TabIndex = 31;
+            this.btnLoadCod.Text = "Load COD";
+            this.btnLoadCod.UseVisualStyleBackColor = true;
+            this.btnLoadCod.Click += new System.EventHandler(this.btnLoadCod_Click);
+            // 
             // Spanner
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(933, 674);
+            this.Controls.Add(this.btnLoadCod);
             this.Controls.Add(this.chkPaciReunion);
             this.Controls.Add(this.chkPaciStill);
             this.Controls.Add(this.chkPaciFreePlay);
@@ -556,6 +569,7 @@
         private System.Windows.Forms.CheckBox chkPaciFreePlay;
         private System.Windows.Forms.CheckBox chkPaciStill;
         private System.Windows.Forms.CheckBox chkPaciReunion;
+        private System.Windows.Forms.Button btnLoadCod;
     }
 }
 

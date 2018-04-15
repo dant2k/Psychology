@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Xml;
 
 namespace MidnightOilGames
 {
@@ -42,6 +43,8 @@ namespace MidnightOilGames
 
                 button1.Enabled = false;
                 cmdExport.Enabled = true;
+
+                btnLoadCod.Enabled = true;
             }
         }
 
@@ -533,6 +536,58 @@ namespace MidnightOilGames
         {
             if (e.KeyCode == Keys.F1)
                 f1_hit();
+        }
+
+        private void btnLoadCod_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openFileDialog1 = new OpenFileDialog();
+            openFileDialog1.Filter = "COD files (*.cod)|*.cod";
+
+            if (openFileDialog1.ShowDialog() != DialogResult.OK)
+                return;
+
+            XmlDocument loaded_xml = new XmlDocument();
+            loaded_xml.Load(openFileDialog1.FileName);
+
+            XmlNode video_node = loaded_xml.SelectSingleNode("/code/file");
+            string video_key = video_node.InnerText;
+
+            if (video_key != lblVideo.Text)
+            {
+                MessageBox.Show("Doesn't match loaded video.");
+                return;
+            }
+
+            txtCoder.Text = loaded_xml.SelectSingleNode("/code/coder").InnerText;
+            for (int i = 0; i < track_count; i++)
+            {
+                XmlNodeList np_spans = loaded_xml.SelectNodes("/code/tracks/track[@name=\"" + track_label(i).Text + "\"]/span");
+                foreach (XmlNode xspan in np_spans)
+                {
+                    int start = Int32.Parse(xspan.SelectSingleNode("@start").InnerText);
+                    int end = Int32.Parse(xspan.SelectSingleNode("@end").InnerText);
+                    span s = new span();
+                    s.start = start;
+                    s.end = end;
+                    s.track = i;
+                    track_spans[i].Add(s);
+                }
+            }
+
+            XmlNode flags = loaded_xml.SelectSingleNode("/code/flags");
+            if (flags != null)
+            {
+                chkPaciFreePlay.Checked = flags.SelectSingleNode("@paci_free").InnerText == "1";
+                chkPaciNatPlay.Checked = flags.SelectSingleNode("@paci_nat").InnerText == "1";
+                chkStillFaceAbort.Checked = flags.SelectSingleNode("@still_abort").InnerText == "1";
+                chkSexRevealed.Checked = flags.SelectSingleNode("@sex_revealed").InnerText == "1";
+                chkPaciReunion.Checked = flags.SelectSingleNode("@paci_reunion").InnerText == "1";
+                chkPaciStill.Checked = flags.SelectSingleNode("@paci_still").InnerText == "1";
+            }
+
+            pictureBox1.Invalidate();
+            pictureBox2.Invalidate();
+
         }
     }
 }
