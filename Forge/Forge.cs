@@ -99,6 +99,27 @@ namespace Forge
             public List<TimeSpan> self_soothe = new List<TimeSpan>();
             public List<TimeSpan> escape = new List<TimeSpan>();
 
+            // parsed flags
+            public bool sex_revealed = false;
+            public bool still_abort = false;
+            public bool paci_nat = false;
+            public bool paci_free = false;
+            public bool paci_still = false;
+            public bool paci_reunion = false;
+
+            public bool get_paci(TaskType t)
+            {
+                switch (t)
+                {
+                    case TaskType.eFreePlay: return paci_free;
+                    case TaskType.eNaturalPlay: return paci_nat;
+                    case TaskType.eReunion: return paci_reunion;
+                    case TaskType.eStillFace: return paci_still;
+                }
+                return false;
+            }
+            
+
             public void parse_task(string task_name, TimeSpan output_span)
             {
                 XmlNode task_1 = xml.SelectSingleNode("/code/tracks/track[@name=\"" + task_name + "\"]");
@@ -361,6 +382,15 @@ namespace Forge
                 codfile.parse_spans("Self Soothe", codfile.self_soothe);
                 codfile.parse_spans("Escape", codfile.escape);
 
+                XmlNode flags_node = loaded_xml.SelectSingleNode("/code/flags");
+                codfile.sex_revealed = flags_node.SelectSingleNode("@sex_revealed").InnerText != "0";
+                codfile.still_abort = flags_node.SelectSingleNode("@still_abort").InnerText != "0";
+                codfile.paci_nat = flags_node.SelectSingleNode("@paci_nat").InnerText != "0";
+                codfile.paci_free = flags_node.SelectSingleNode("@paci_free").InnerText != "0";
+                codfile.paci_still = flags_node.SelectSingleNode("@paci_still").InnerText != "0";
+                codfile.paci_reunion = flags_node.SelectSingleNode("@paci_reunion").InnerText != "0";
+
+                
                 if (codfile.errors.Count != 0)
                 {
                     // remove from the videos list and add to the errors list.
@@ -1138,10 +1168,14 @@ namespace Forge
                     if (measures[i] == MeasureType.eBabyInvis)
                         continue; // not a data measure.
                     SB.AppendFormat("oi{2}{0}{1}", Reliability.get_task_abbrev(tasks[t]), Reliability.get_measure_abbrev(measures[i]), DetectedTimepoint.Substring(1));
-                    if (t != tasks.Length - 1 || i != measures.Length - 1)
-                        SB.Append(",");
+                    //if (t != tasks.Length - 1 || i != measures.Length - 1)
+                    SB.Append(",");
                 }
+                SB.AppendFormat("oi{0}{1}pac,", DetectedTimepoint.Substring(1), Reliability.get_task_abbrev(tasks[t]));
             }
+            SB.AppendFormat("oi{0}sr,", DetectedTimepoint.Substring(1));
+            SB.AppendFormat("oi{0}sfe,", DetectedTimepoint.Substring(1));
+            SB.AppendFormat("oi{0}sft", DetectedTimepoint.Substring(1));
             SB.Append("\r\n");
 
             List<CodVideo> needs_accepted = new List<CodVideo>();
@@ -1209,10 +1243,19 @@ namespace Forge
                         }
 
                         SB.Append((count_coded / (float)count_total));
-                        if (t != tasks.Length - 1 || m != measures.Length - 1)
+                        //if (t != tasks.Length - 1 || m != measures.Length - 1)
                             SB.Append(",");
                     }
+
+                    SB.Append(file.get_paci(tasks[t]) ? "1" : "0");
+                    SB.Append(",");
                 }
+
+                SB.Append(file.sex_revealed ? "1," : "0,");
+                SB.Append(file.still_abort ? "1," : "0,");
+
+                if (file.still_abort)
+                    SB.Append(file.timespans.still_face.end_sec - file.timespans.still_face.start_sec);
             } // end for each video
 
             if (needs_accepted.Count != 0)
