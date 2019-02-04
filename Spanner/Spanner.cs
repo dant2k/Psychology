@@ -464,14 +464,14 @@ namespace MidnightOilGames
             SB.Append("\t<version>2</version>\r\n");
             SB.AppendFormat("\t<file>{0}</file>\r\n", lblVideo.Text);
             SB.AppendFormat("\t<coder>{0}</coder>\r\n", txtCoder.Text);
-            SB.AppendFormat("\t<flags sex_revealed=\"{0}\" still_abort=\"{1}\" paci_nat=\"{2}\" paci_free=\"{3}\" paci_still=\"{4}\" paci_reunion=\"{5}\"/>\r\n",
-                chkSexRevealed.Checked ? 1 : 0,
-                chkStillFaceAbort.Checked ? 1 : 0,
-                chkPaciNatPlay.Checked ? 1 : 0,
-                chkPaciFreePlay.Checked ? 1 : 0,
-                chkPaciStill.Checked ? 1 : 0,
-                chkPaciReunion.Checked ? 1 : 0
-                );
+            //SB.AppendFormat("\t<flags sex_revealed=\"{0}\" still_abort=\"{1}\" paci_nat=\"{2}\" paci_free=\"{3}\" paci_still=\"{4}\" paci_reunion=\"{5}\"/>\r\n",
+            //    chkSexRevealed.Checked ? 1 : 0,
+            //    chkStillFaceAbort.Checked ? 1 : 0,
+            //    chkPaciNatPlay.Checked ? 1 : 0,
+            //    chkPaciFreePlay.Checked ? 1 : 0,
+            //    chkPaciStill.Checked ? 1 : 0,
+            //    chkPaciReunion.Checked ? 1 : 0
+            //    );
             SB.Append("\t<tracks>\r\n");
             for (int track = 0; track < track_count; track++)
             {
@@ -574,16 +574,16 @@ namespace MidnightOilGames
                 }
             }
 
-            XmlNode flags = loaded_xml.SelectSingleNode("/code/flags");
-            if (flags != null)
-            {
-                chkPaciFreePlay.Checked = flags.SelectSingleNode("@paci_free").InnerText == "1";
-                chkPaciNatPlay.Checked = flags.SelectSingleNode("@paci_nat").InnerText == "1";
-                chkStillFaceAbort.Checked = flags.SelectSingleNode("@still_abort").InnerText == "1";
-                chkSexRevealed.Checked = flags.SelectSingleNode("@sex_revealed").InnerText == "1";
-                chkPaciReunion.Checked = flags.SelectSingleNode("@paci_reunion").InnerText == "1";
-                chkPaciStill.Checked = flags.SelectSingleNode("@paci_still").InnerText == "1";
-            }
+            //XmlNode flags = loaded_xml.SelectSingleNode("/code/flags");
+            //if (flags != null)
+            //{
+            //    chkPaciFreePlay.Checked = flags.SelectSingleNode("@paci_free").InnerText == "1";
+            //    chkPaciNatPlay.Checked = flags.SelectSingleNode("@paci_nat").InnerText == "1";
+            //    chkStillFaceAbort.Checked = flags.SelectSingleNode("@still_abort").InnerText == "1";
+            //    chkSexRevealed.Checked = flags.SelectSingleNode("@sex_revealed").InnerText == "1";
+            //    chkPaciReunion.Checked = flags.SelectSingleNode("@paci_reunion").InnerText == "1";
+            //    chkPaciStill.Checked = flags.SelectSingleNode("@paci_still").InnerText == "1";
+            //}
 
             pictureBox1.Invalidate();
             pictureBox2.Invalidate();
