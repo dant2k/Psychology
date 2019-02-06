@@ -24,7 +24,7 @@ namespace MidnightOilGames
         {
             OpenFileDialog openFileDialog1 = new OpenFileDialog();
 
-            openFileDialog1.Filter = "mp4 files (*.mp4)|*.mp4|All files (*.*)|*.*";
+            openFileDialog1.Filter = "mp4/mts files (*.mp4, *.mts)|*.mp4;*.mts|All files (*.*)|*.*";
             openFileDialog1.FilterIndex = 1;
             openFileDialog1.RestoreDirectory = true;
 
