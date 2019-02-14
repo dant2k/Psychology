@@ -172,9 +172,9 @@
             this.label5.AutoSize = true;
             this.label5.Location = new System.Drawing.Point(50, 429);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(64, 13);
+            this.label5.Size = new System.Drawing.Size(57, 13);
             this.label5.TabIndex = 7;
-            this.label5.Text = "Natural Play";
+            this.label5.Text = "Single Toy";
             // 
             // label6
             // 
@@ -182,9 +182,9 @@
             this.label6.AutoSize = true;
             this.label6.Location = new System.Drawing.Point(124, 429);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(51, 13);
+            this.label6.Size = new System.Drawing.Size(39, 13);
             this.label6.TabIndex = 8;
-            this.label6.Text = "Free Play";
+            this.label6.Text = "6 Toys";
             // 
             // label7
             // 
@@ -195,6 +195,7 @@
             this.label7.Size = new System.Drawing.Size(50, 13);
             this.label7.TabIndex = 9;
             this.label7.Text = "Still Face";
+            this.label7.Visible = false;
             // 
             // label8
             // 
@@ -205,6 +206,7 @@
             this.label8.Size = new System.Drawing.Size(47, 13);
             this.label8.TabIndex = 10;
             this.label8.Text = "Reunion";
+            this.label8.Visible = false;
             // 
             // txtNatPlayStart
             // 
@@ -249,6 +251,7 @@
             this.txtStillEnd.Name = "txtStillEnd";
             this.txtStillEnd.Size = new System.Drawing.Size(67, 20);
             this.txtStillEnd.TabIndex = 16;
+            this.txtStillEnd.Visible = false;
             this.txtStillEnd.Leave += new System.EventHandler(this.txtStillEnd_Leave);
             // 
             // txtStillStart
@@ -258,6 +261,7 @@
             this.txtStillStart.Name = "txtStillStart";
             this.txtStillStart.Size = new System.Drawing.Size(67, 20);
             this.txtStillStart.TabIndex = 15;
+            this.txtStillStart.Visible = false;
             this.txtStillStart.Leave += new System.EventHandler(this.txtStillStart_Leave);
             // 
             // txtReunionEnd
@@ -267,6 +271,7 @@
             this.txtReunionEnd.Name = "txtReunionEnd";
             this.txtReunionEnd.Size = new System.Drawing.Size(67, 20);
             this.txtReunionEnd.TabIndex = 18;
+            this.txtReunionEnd.Visible = false;
             this.txtReunionEnd.Leave += new System.EventHandler(this.txtReunionEnd_Leave);
             // 
             // txtReunionStart
@@ -276,6 +281,7 @@
             this.txtReunionStart.Name = "txtReunionStart";
             this.txtReunionStart.Size = new System.Drawing.Size(67, 20);
             this.txtReunionStart.TabIndex = 17;
+            this.txtReunionStart.Visible = false;
             this.txtReunionStart.Leave += new System.EventHandler(this.txtReunionStart_Leave);
             // 
             // btnAccepted
@@ -484,7 +490,7 @@
             this.Controls.Add(this.label1);
             this.MinimumSize = new System.Drawing.Size(640, 543);
             this.Name = "Forge";
-            this.Text = "Forge";
+            this.Text = "Forge - Clearfield";
             this.Load += new System.EventHandler(this.Forge_Load);
             this.ResumeLayout(false);
             this.PerformLayout();

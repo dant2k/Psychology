@@ -56,10 +56,17 @@ namespace Forge
 
         public class CodTaskTimespans
         {
-            public TimeSpan nat_play = new TimeSpan();
-            public TimeSpan free_play = new TimeSpan();
-            public TimeSpan still_face = new TimeSpan();
-            public TimeSpan reunion = new TimeSpan();
+            public TimeSpan toy_1 = new TimeSpan();
+            public TimeSpan toy_6 = new TimeSpan();
+            public TimeSpan get_task(TaskType t)
+            {
+                switch (t)
+                {
+                    case TaskType.eToy1: return toy_1;
+                    case TaskType.eToy6: return toy_6;
+                }
+                throw new Exception("fucked");
+            }
         };
 
         [DataContract]
@@ -82,6 +89,11 @@ namespace Forge
             public XmlDocument xml;
             public string source_file_name;
 
+            public string get_famid()
+            {
+                return source_file_name.Substring(source_file_name.LastIndexOf('\\') + 1, 3);
+            }
+
             public string coder;
             public CodVideo video;
 
@@ -94,32 +106,23 @@ namespace Forge
 
             // parsed timespans for codes.
             public List<TimeSpan> baby_invisible = new List<TimeSpan>();
-            public List<TimeSpan> orient_object = new List<TimeSpan>();
-            public List<TimeSpan> orient_mother = new List<TimeSpan>();
-            public List<TimeSpan> self_soothe = new List<TimeSpan>();
-            public List<TimeSpan> escape = new List<TimeSpan>();
+            public List<TimeSpan> toy = new List<TimeSpan>();
+            public List<TimeSpan> people = new List<TimeSpan>();
+            public List<TimeSpan> quiet_dis = new List<TimeSpan>();
+            public List<TimeSpan> inattent = new List<TimeSpan>();
 
-            // parsed flags
-            public bool sex_revealed = false;
-            public bool still_abort = false;
-            public bool paci_nat = false;
-            public bool paci_free = false;
-            public bool paci_still = false;
-            public bool paci_reunion = false;
-
-            public bool get_paci(TaskType t)
+            public List<TimeSpan> get_measure(MeasureType m)
             {
-                switch (t)
+                switch (m)
                 {
-                    case TaskType.eFreePlay: return paci_free;
-                    case TaskType.eNaturalPlay: return paci_nat;
-                    case TaskType.eReunion: return paci_reunion;
-                    case TaskType.eStillFace: return paci_still;
+                    case MeasureType.eBabyInvis: return baby_invisible;
+                    case MeasureType.eInattent: return inattent;
+                    case MeasureType.ePeople: return people;
+                    case MeasureType.eQuietDis: return quiet_dis;
+                    case MeasureType.eToy: return toy;
                 }
-                return false;
+                throw new Exception("fucked again");
             }
-            
-
             public void parse_task(string task_name, TimeSpan output_span)
             {
                 XmlNode task_1 = xml.SelectSingleNode("/code/tracks/track[@name=\"" + task_name + "\"]");
@@ -212,7 +215,7 @@ namespace Forge
         List<CodFile> ErrorFiles = new List<CodFile>();
         Dictionary<string, CodVideo> Videos = new Dictionary<string, CodVideo>();
         public CachedDecisions Decisions = new CachedDecisions();
-        string DetectedTimepoint;
+        //string DetectedTimepoint;
 
         void save_decisions()
         {
@@ -252,10 +255,10 @@ namespace Forge
                 txtNatPlayEnd.Text = "";
                 txtFreePlayEnd.Text = "";
                 txtFreePlayStart.Text = "";
-                txtStillEnd.Text = "";
-                txtStillStart.Text = "";
-                txtReunionEnd.Text = "";
-                txtReunionStart.Text = "";
+                //txtStillEnd.Text = "";
+                //txtStillStart.Text = "";
+                //txtReunionEnd.Text = "";
+                //txtReunionStart.Text = "";
             }
             else
             {
@@ -267,14 +270,14 @@ namespace Forge
                     // show the values.
                     CodTaskTimespans reliability_timespans = Decisions.reliability_baselines[selected_video.video];
 
-                    txtNatPlayStart.Text = seconds_to_string(reliability_timespans.nat_play.start_sec);
-                    txtNatPlayEnd.Text = seconds_to_string(reliability_timespans.nat_play.end_sec);
-                    txtFreePlayStart.Text = seconds_to_string(reliability_timespans.free_play.start_sec);
-                    txtFreePlayEnd.Text = seconds_to_string(reliability_timespans.free_play.end_sec);
-                    txtStillStart.Text = seconds_to_string(reliability_timespans.still_face.start_sec);
-                    txtStillEnd.Text = seconds_to_string(reliability_timespans.still_face.end_sec);
-                    txtReunionStart.Text = seconds_to_string(reliability_timespans.reunion.start_sec);
-                    txtReunionEnd.Text = seconds_to_string(reliability_timespans.reunion.end_sec);
+                    txtNatPlayStart.Text = seconds_to_string(reliability_timespans.toy_1.start_sec);
+                    txtNatPlayEnd.Text = seconds_to_string(reliability_timespans.toy_1.end_sec);
+                    txtFreePlayStart.Text = seconds_to_string(reliability_timespans.toy_6.start_sec);
+                    txtFreePlayEnd.Text = seconds_to_string(reliability_timespans.toy_6.end_sec);
+                    //txtStillStart.Text = seconds_to_string(reliability_timespans.still_face.start_sec);
+                    //txtStillEnd.Text = seconds_to_string(reliability_timespans.still_face.end_sec);
+                    //txtReunionStart.Text = seconds_to_string(reliability_timespans.reunion.start_sec);
+                    //txtReunionEnd.Text = seconds_to_string(reliability_timespans.reunion.end_sec);
                 }
                 else
                 {
@@ -283,10 +286,10 @@ namespace Forge
                     txtNatPlayEnd.Text = "";
                     txtFreePlayEnd.Text = "";
                     txtFreePlayStart.Text = "";
-                    txtStillEnd.Text = "";
-                    txtStillStart.Text = "";
-                    txtReunionEnd.Text = "";
-                    txtReunionStart.Text = "";
+                    //txtStillEnd.Text = "";
+                    //txtStillStart.Text = "";
+                    //txtReunionEnd.Text = "";
+                    //txtReunionStart.Text = "";
                 }
             }
         }
@@ -351,11 +354,11 @@ namespace Forge
                 else
                     video = Videos[video_key];
 
-                if (DetectedTimepoint == null)
-                {
-                    DetectedTimepoint = video.video.Substring(0, 2);
-                    lblTimepoint.Text = DetectedTimepoint;
-                }
+                //if (DetectedTimepoint == null)
+                //{
+                //    DetectedTimepoint = video.video.Substring(0, 2);
+                //    lblTimepoint.Text = DetectedTimepoint;
+                //}
 
                 CodFile codfile = new CodFile();
                 video.codes.Add(codfile);
@@ -371,25 +374,16 @@ namespace Forge
                 // parse the tracks.
 
                 // The task tracks should ONLY have one track.
-                codfile.parse_task("Naturalistic Play", codfile.timespans.nat_play);
-                codfile.parse_task("Free Play", codfile.timespans.free_play);
-                codfile.parse_task("Still Face", codfile.timespans.still_face);
-                codfile.parse_task("Reunion", codfile.timespans.reunion);
+                codfile.parse_task("Single Toy", codfile.timespans.toy_1);
+                codfile.parse_task("6 Toy", codfile.timespans.toy_6);
+                //codfile.parse_task("Still Face", codfile.timespans.still_face);
+                //codfile.parse_task("Reunion", codfile.timespans.reunion);
 
                 codfile.parse_spans("Baby Hidden", codfile.baby_invisible);
-                codfile.parse_spans("Orient: Object", codfile.orient_object);
-                codfile.parse_spans("Orient: Mother", codfile.orient_mother);
-                codfile.parse_spans("Self Soothe", codfile.self_soothe);
-                codfile.parse_spans("Escape", codfile.escape);
-
-                XmlNode flags_node = loaded_xml.SelectSingleNode("/code/flags");
-                codfile.sex_revealed = flags_node.SelectSingleNode("@sex_revealed").InnerText != "0";
-                codfile.still_abort = flags_node.SelectSingleNode("@still_abort").InnerText != "0";
-                codfile.paci_nat = flags_node.SelectSingleNode("@paci_nat").InnerText != "0";
-                codfile.paci_free = flags_node.SelectSingleNode("@paci_free").InnerText != "0";
-                codfile.paci_still = flags_node.SelectSingleNode("@paci_still").InnerText != "0";
-                codfile.paci_reunion = flags_node.SelectSingleNode("@paci_reunion").InnerText != "0";
-
+                codfile.parse_spans("Toy", codfile.toy);
+                codfile.parse_spans("People", codfile.people);
+                codfile.parse_spans("Quiet Disengage", codfile.quiet_dis);
+                codfile.parse_spans("Inattention", codfile.inattent);
                 
                 if (codfile.errors.Count != 0)
                 {
@@ -525,7 +519,7 @@ namespace Forge
             if (Decisions.reliability_baselines.ContainsKey(selected_video.video) == false)
                 Decisions.reliability_baselines[selected_video.video] = new CodTaskTimespans();
 
-            parse_time_input(txtNatPlayStart, ref Decisions.reliability_baselines[selected_video.video].nat_play.start_sec);
+            parse_time_input(txtNatPlayStart, ref Decisions.reliability_baselines[selected_video.video].toy_1.start_sec);
             sync_list_view();
         }
 
@@ -541,7 +535,7 @@ namespace Forge
             if (Decisions.reliability_baselines.ContainsKey(selected_video.video) == false)
                 Decisions.reliability_baselines[selected_video.video] = new CodTaskTimespans();
 
-            parse_time_input(txtNatPlayEnd, ref Decisions.reliability_baselines[selected_video.video].nat_play.end_sec);
+            parse_time_input(txtNatPlayEnd, ref Decisions.reliability_baselines[selected_video.video].toy_1.end_sec);
             sync_list_view();
         }
 
@@ -557,7 +551,7 @@ namespace Forge
             if (Decisions.reliability_baselines.ContainsKey(selected_video.video) == false)
                 Decisions.reliability_baselines[selected_video.video] = new CodTaskTimespans();
 
-            parse_time_input(txtFreePlayStart, ref Decisions.reliability_baselines[selected_video.video].free_play.start_sec);
+            parse_time_input(txtFreePlayStart, ref Decisions.reliability_baselines[selected_video.video].toy_6.start_sec);
             sync_list_view();
         }
 
@@ -573,108 +567,108 @@ namespace Forge
             if (Decisions.reliability_baselines.ContainsKey(selected_video.video) == false)
                 Decisions.reliability_baselines[selected_video.video] = new CodTaskTimespans();
 
-            parse_time_input(txtFreePlayEnd, ref Decisions.reliability_baselines[selected_video.video].free_play.end_sec);
+            parse_time_input(txtFreePlayEnd, ref Decisions.reliability_baselines[selected_video.video].toy_6.end_sec);
             sync_list_view();
         }
 
         private void txtStillStart_Leave(object sender, EventArgs e)
         {
-            if (lstVideos.SelectedItems.Count == 0)
-                return; // we are setting the text from code - don't parse, or nothing is selected.
+            //if (lstVideos.SelectedItems.Count == 0)
+            //    return; // we are setting the text from code - don't parse, or nothing is selected.
 
-            CodVideo selected_video = Videos[lstVideos.SelectedItems[0].Text];
-            if (selected_video.codes.Count == 1)
-                return; // don't need reliability.
+            //CodVideo selected_video = Videos[lstVideos.SelectedItems[0].Text];
+            //if (selected_video.codes.Count == 1)
+            //    return; // don't need reliability.
 
-            if (Decisions.reliability_baselines.ContainsKey(selected_video.video) == false)
-                Decisions.reliability_baselines[selected_video.video] = new CodTaskTimespans();
+            //if (Decisions.reliability_baselines.ContainsKey(selected_video.video) == false)
+            //    Decisions.reliability_baselines[selected_video.video] = new CodTaskTimespans();
 
-            parse_time_input(txtStillStart, ref Decisions.reliability_baselines[selected_video.video].still_face.start_sec);
-            sync_list_view();
+            //parse_time_input(txtStillStart, ref Decisions.reliability_baselines[selected_video.video].still_face.start_sec);
+            //sync_list_view();
         }
 
         private void txtStillEnd_Leave(object sender, EventArgs e)
         {
-            if (lstVideos.SelectedItems.Count == 0)
-                return; // we are setting the text from code - don't parse, or nothing is selected.
+            //if (lstVideos.SelectedItems.Count == 0)
+            //    return; // we are setting the text from code - don't parse, or nothing is selected.
 
-            CodVideo selected_video = Videos[lstVideos.SelectedItems[0].Text];
-            if (selected_video.codes.Count == 1)
-                return; // don't need reliability.
+            //CodVideo selected_video = Videos[lstVideos.SelectedItems[0].Text];
+            //if (selected_video.codes.Count == 1)
+            //    return; // don't need reliability.
 
-            if (Decisions.reliability_baselines.ContainsKey(selected_video.video) == false)
-                Decisions.reliability_baselines[selected_video.video] = new CodTaskTimespans();
+            //if (Decisions.reliability_baselines.ContainsKey(selected_video.video) == false)
+            //    Decisions.reliability_baselines[selected_video.video] = new CodTaskTimespans();
 
-            parse_time_input(txtStillEnd, ref Decisions.reliability_baselines[selected_video.video].still_face.end_sec);
-            sync_list_view();
+            //parse_time_input(txtStillEnd, ref Decisions.reliability_baselines[selected_video.video].still_face.end_sec);
+            //sync_list_view();
         }
 
         private void txtReunionStart_Leave(object sender, EventArgs e)
         {
-            if (lstVideos.SelectedItems.Count == 0)
-                return; // we are setting the text from code - don't parse, or nothing is selected.
+            //if (lstVideos.SelectedItems.Count == 0)
+            //    return; // we are setting the text from code - don't parse, or nothing is selected.
 
-            CodVideo selected_video = Videos[lstVideos.SelectedItems[0].Text];
-            if (selected_video.codes.Count == 1)
-                return; // don't need reliability.
+            //CodVideo selected_video = Videos[lstVideos.SelectedItems[0].Text];
+            //if (selected_video.codes.Count == 1)
+            //    return; // don't need reliability.
 
-            if (Decisions.reliability_baselines.ContainsKey(selected_video.video) == false)
-                Decisions.reliability_baselines[selected_video.video] = new CodTaskTimespans();
+            //if (Decisions.reliability_baselines.ContainsKey(selected_video.video) == false)
+            //    Decisions.reliability_baselines[selected_video.video] = new CodTaskTimespans();
 
-            parse_time_input(txtReunionStart, ref Decisions.reliability_baselines[selected_video.video].reunion.start_sec);
-            sync_list_view();
+            //parse_time_input(txtReunionStart, ref Decisions.reliability_baselines[selected_video.video].reunion.start_sec);
+            //sync_list_view();
         }
 
         private void txtReunionEnd_Leave(object sender, EventArgs e)
         {
-            if (lstVideos.SelectedItems.Count == 0)
-                return; // we are setting the text from code - don't parse, or nothing is selected.
+            //if (lstVideos.SelectedItems.Count == 0)
+            //    return; // we are setting the text from code - don't parse, or nothing is selected.
 
-            CodVideo selected_video = Videos[lstVideos.SelectedItems[0].Text];
-            if (selected_video.codes.Count == 1)
-                return; // don't need reliability.
+            //CodVideo selected_video = Videos[lstVideos.SelectedItems[0].Text];
+            //if (selected_video.codes.Count == 1)
+            //    return; // don't need reliability.
 
-            if (Decisions.reliability_baselines.ContainsKey(selected_video.video) == false)
-                Decisions.reliability_baselines[selected_video.video] = new CodTaskTimespans();
+            //if (Decisions.reliability_baselines.ContainsKey(selected_video.video) == false)
+            //    Decisions.reliability_baselines[selected_video.video] = new CodTaskTimespans();
 
-            parse_time_input(txtReunionEnd, ref Decisions.reliability_baselines[selected_video.video].reunion.end_sec);
-            sync_list_view();
+            //parse_time_input(txtReunionEnd, ref Decisions.reliability_baselines[selected_video.video].reunion.end_sec);
+            //sync_list_view();
         }
         
-        enum TaskType
+        public enum TaskType
         {
-            eNaturalPlay,
-            eFreePlay,
-            eStillFace,
-            eReunion
+            eToy1,
+            eToy6,
+            //eStillFace,
+            //eReunion
         };
 
-        enum MeasureType
+        public enum MeasureType
         {
             eBabyInvis,
-            eEscape,
-            eMother,
-            eObject,
-            eSoothe
+            eToy,
+            ePeople,
+            eQuietDis,
+            eInattent
         };
 
         class ReliabilityTask
         {
             public List<bool> baby_invisible = new List<bool>();
-            public List<bool> escape = new List<bool>();
-            public List<bool> orient_mother = new List<bool>();
-            public List<bool> orient_object = new List<bool>();
-            public List<bool> self_soothe = new List<bool>();
+            public List<bool> toy = new List<bool>();
+            public List<bool> person = new List<bool>();
+            public List<bool> quiet_dis = new List<bool>();
+            public List<bool> inatten = new List<bool>();
 
             public List<bool> GetMeasure(MeasureType type)
             {
                 switch (type)
                 {
                     case MeasureType.eBabyInvis: return baby_invisible;
-                    case MeasureType.eEscape: return escape;
-                    case MeasureType.eMother: return orient_mother;
-                    case MeasureType.eObject: return orient_object;
-                    case MeasureType.eSoothe: return self_soothe;
+                    case MeasureType.eToy: return toy;
+                    case MeasureType.ePeople: return person;
+                    case MeasureType.eQuietDis: return quiet_dis;
+                    case MeasureType.eInattent: return inatten;
                 }
                 return null;
             }
@@ -683,10 +677,10 @@ namespace Forge
         {
             public string coder;
 
-            public ReliabilityTask nat_play = new ReliabilityTask();
-            public ReliabilityTask free_play = new ReliabilityTask();
-            public ReliabilityTask still_face = new ReliabilityTask();
-            public ReliabilityTask reunion = new ReliabilityTask();
+            public ReliabilityTask toy_1 = new ReliabilityTask();
+            public ReliabilityTask toy_6 = new ReliabilityTask();
+            //public ReliabilityTask still_face = new ReliabilityTask();
+            //public ReliabilityTask reunion = new ReliabilityTask();
 
             public int CompareTo(object other)
             {
@@ -696,10 +690,10 @@ namespace Forge
             {
                 switch (task)
                 {
-                    case TaskType.eNaturalPlay: return nat_play;
-                    case TaskType.eFreePlay: return free_play;
-                    case TaskType.eReunion: return reunion;
-                    case TaskType.eStillFace: return still_face;
+                    case TaskType.eToy1: return toy_1;
+                    case TaskType.eToy6: return toy_6;
+                    //case TaskType.eReunion: return reunion;
+                    //case TaskType.eStillFace: return still_face;
                 }
                 throw new Exception();
             }
@@ -707,10 +701,10 @@ namespace Forge
             {
                 switch (task)
                 {
-                    case TaskType.eNaturalPlay: return "natpl";
-                    case TaskType.eFreePlay: return "freepl";
-                    case TaskType.eReunion: return "reun";
-                    case TaskType.eStillFace: return "stillf";
+                    case TaskType.eToy1: return "toy1_";
+                    case TaskType.eToy6: return "toy6_";
+                    //case TaskType.eReunion: return "reun";
+                    //case TaskType.eStillFace: return "stillf";
                 }
                 throw new Exception();
             }
@@ -718,10 +712,10 @@ namespace Forge
             {
                 switch (task)
                 {
-                    case TaskType.eNaturalPlay: return "np";
-                    case TaskType.eFreePlay: return "fp";
-                    case TaskType.eReunion: return "re";
-                    case TaskType.eStillFace: return "sf";
+                    case TaskType.eToy1: return "f1";
+                    case TaskType.eToy6: return "f6";
+                    //case TaskType.eReunion: return "re";
+                    //case TaskType.eStillFace: return "sf";
                 }
                 throw new Exception();
             }
@@ -730,10 +724,10 @@ namespace Forge
                 switch (measure)
                 {
                     case MeasureType.eBabyInvis: return "binvis";
-                    case MeasureType.eEscape: return "escape";
-                    case MeasureType.eMother: return "omother";
-                    case MeasureType.eObject: return "oobject";
-                    case MeasureType.eSoothe: return "ssoothe";
+                    case MeasureType.eToy: return "toy";
+                    case MeasureType.ePeople: return "people";
+                    case MeasureType.eQuietDis: return "quietdis";
+                    case MeasureType.eInattent: return "inatten";
                 }
                 throw new Exception();
             }
@@ -742,10 +736,10 @@ namespace Forge
                 switch (measure)
                 {
                     case MeasureType.eBabyInvis: return "inv";
-                    case MeasureType.eEscape: return "esc";
-                    case MeasureType.eMother: return "mom";
-                    case MeasureType.eObject: return "obj";
-                    case MeasureType.eSoothe: return "soo";
+                    case MeasureType.eToy: return "toy";
+                    case MeasureType.ePeople: return "per";
+                    case MeasureType.eQuietDis: return "qdi";
+                    case MeasureType.eInattent: return "ina";
                 }
                 throw new Exception();
             }
@@ -774,10 +768,10 @@ namespace Forge
                     epoch.end_sec = current_epoch_start + epoch_len_sec;
 
                     run_measure(epoch, task.baby_invisible, code.baby_invisible);
-                    run_measure(epoch, task.escape, code.escape);
-                    run_measure(epoch, task.orient_mother, code.orient_mother);
-                    run_measure(epoch, task.orient_object, code.orient_object);
-                    run_measure(epoch, task.self_soothe, code.self_soothe);
+                    run_measure(epoch, task.toy, code.toy);
+                    run_measure(epoch, task.person, code.people);
+                    run_measure(epoch, task.quiet_dis, code.quiet_dis);
+                    run_measure(epoch, task.inatten, code.inattent);
                 }
             }
         };
@@ -836,6 +830,13 @@ namespace Forge
 
                 CodTaskTimespans reliability_baselines = Decisions.reliability_baselines[video.video];
 
+                {
+                    //
+                    // For clearfield, we want to track the time for each measure as a proportion of the
+                    // time for the task, for each video. This time has to take in to account the baby
+                    // invisible time.
+                    //
+                }
                 video.reliability.Clear();
 
                 // Iterate over the task timespans, outputting whether the code was set
@@ -845,17 +846,17 @@ namespace Forge
                     Reliability r = new Reliability();
                     r.coder = code.coder;
 
-                    r.run_task(r.free_play, reliability_baselines.free_play, code, epoch_len_sec);
-                    r.run_task(r.nat_play, reliability_baselines.nat_play, code, epoch_len_sec);
-                    r.run_task(r.reunion, reliability_baselines.reunion, code, epoch_len_sec);
-                    r.run_task(r.still_face, reliability_baselines.still_face, code, epoch_len_sec);
+                    r.run_task(r.toy_1, reliability_baselines.toy_1, code, epoch_len_sec);
+                    r.run_task(r.toy_6, reliability_baselines.toy_6, code, epoch_len_sec);
+                    //r.run_task(r.reunion, reliability_baselines.reunion, code, epoch_len_sec);
+                    //r.run_task(r.still_face, reliability_baselines.still_face, code, epoch_len_sec);
 
                     video.reliability.Add(r);
                 }
 
                 video.reliability.Sort();
 
-                bool has_primary_coder = video.reliability[0].coder == "9000";
+                bool has_primary_coder = video.reliability[0].coder == "300";
 
                 for (int outer = 0; outer < (has_primary_coder ? 1 : video.reliability.Count); outer++)
                 {
@@ -993,10 +994,10 @@ namespace Forge
                                 switch (code)
                                 {
                                     case 0: code_key = 'b'; code_string = "baby hidden"; break;
-                                    case 1: code_key = 'o'; code_string = "orient object"; break;
-                                    case 2: code_key = 'm'; code_string = "orient mother"; break;
-                                    case 3: code_key = 'e'; code_string = "escape"; break;
-                                    case 4: code_key = 's'; code_string = "self soothe"; break;
+                                    case 1: code_key = 'f'; code_string = "toy"; break;
+                                    case 2: code_key = 'p'; code_string = "person"; break;
+                                    case 3: code_key = 'q'; code_string = "quiet disengage"; break;
+                                    case 4: code_key = 'i'; code_string = "inattentiveness"; break;
                                 }
                                 syntax.AppendFormat("* {0}.\r\n", code_string);
                                 syntax.Append("CROSSTABS\r\n");
@@ -1018,7 +1019,7 @@ namespace Forge
                 for (int r = 0; r < video.reliability.Count; r++)
                 {
                     Reliability R = (Reliability)video.reliability[r];
-                    SB.AppendFormat("b{0},o{0},m{0},e{0},s{0}", R.coder);
+                    SB.AppendFormat("b{0},f{0},p{0},q{0},i{0}", R.coder);
                     if (r < video.reliability.Count - 1)
                         SB.Append(",");
                 }
@@ -1032,6 +1033,8 @@ namespace Forge
                         if (current_epoch >= video.reliability[0].get_task(task).baby_invisible.Count)
                             break;
 
+                        SB.Append(video.codes[0].get_famid());
+                        SB.Append("_");
                         SB.Append(Reliability.get_task_str(task));
                         SB.Append(current_epoch);
                         SB.Append(",");
@@ -1042,10 +1045,10 @@ namespace Forge
                             ReliabilityTask RT = R.get_task(task);
 
                             SB.Append(RT.baby_invisible[current_epoch] ? "1," : "0,");
-                            SB.Append(RT.orient_object[current_epoch] ? "1," : "0,");
-                            SB.Append(RT.orient_mother[current_epoch] ? "1," : "0,");
-                            SB.Append(RT.escape[current_epoch] ? "1," : "0,");
-                            SB.Append(RT.self_soothe[current_epoch] ? "1" : "0");
+                            SB.Append(RT.toy[current_epoch] ? "1," : "0,");
+                            SB.Append(RT.person[current_epoch] ? "1," : "0,");
+                            SB.Append(RT.quiet_dis[current_epoch] ? "1," : "0,");
+                            SB.Append(RT.inatten[current_epoch] ? "1" : "0");
                             if (r < video.reliability.Count - 1)
                                 SB.Append(",");
                         }
@@ -1090,24 +1093,24 @@ namespace Forge
             string coder = lstVideos.SelectedItems[0].SubItems[1].Text;
 
             CodFile cf = selected_video.GetCodFileByCoder(coder);
-            Decisions.reliability_baselines[selected_video.video].free_play.start_sec = cf.timespans.free_play.start_sec;
-            Decisions.reliability_baselines[selected_video.video].free_play.end_sec = cf.timespans.free_play.end_sec;
-            Decisions.reliability_baselines[selected_video.video].nat_play.start_sec = cf.timespans.nat_play.start_sec;
-            Decisions.reliability_baselines[selected_video.video].nat_play.end_sec = cf.timespans.nat_play.end_sec;
-            Decisions.reliability_baselines[selected_video.video].still_face.start_sec = cf.timespans.still_face.start_sec;
-            Decisions.reliability_baselines[selected_video.video].still_face.end_sec = cf.timespans.still_face.end_sec;
-            Decisions.reliability_baselines[selected_video.video].reunion.start_sec = cf.timespans.reunion.start_sec;
-            Decisions.reliability_baselines[selected_video.video].reunion.end_sec = cf.timespans.reunion.end_sec;
+            Decisions.reliability_baselines[selected_video.video].toy_1.start_sec = cf.timespans.toy_1.start_sec;
+            Decisions.reliability_baselines[selected_video.video].toy_1.end_sec = cf.timespans.toy_1.end_sec;
+            Decisions.reliability_baselines[selected_video.video].toy_6.start_sec = cf.timespans.toy_6.start_sec;
+            Decisions.reliability_baselines[selected_video.video].toy_6.end_sec = cf.timespans.toy_6.end_sec;
+            //Decisions.reliability_baselines[selected_video.video].still_face.start_sec = cf.timespans.still_face.start_sec;
+            //Decisions.reliability_baselines[selected_video.video].still_face.end_sec = cf.timespans.still_face.end_sec;
+            //Decisions.reliability_baselines[selected_video.video].reunion.start_sec = cf.timespans.reunion.start_sec;
+            //Decisions.reliability_baselines[selected_video.video].reunion.end_sec = cf.timespans.reunion.end_sec;
 
             CodTaskTimespans reliability_timespans = Decisions.reliability_baselines[selected_video.video];
-            txtNatPlayStart.Text = seconds_to_string(reliability_timespans.nat_play.start_sec);
-            txtNatPlayEnd.Text = seconds_to_string(reliability_timespans.nat_play.end_sec);
-            txtFreePlayStart.Text = seconds_to_string(reliability_timespans.free_play.start_sec);
-            txtFreePlayEnd.Text = seconds_to_string(reliability_timespans.free_play.end_sec);
-            txtStillStart.Text = seconds_to_string(reliability_timespans.still_face.start_sec);
-            txtStillEnd.Text = seconds_to_string(reliability_timespans.still_face.end_sec);
-            txtReunionStart.Text = seconds_to_string(reliability_timespans.reunion.start_sec);
-            txtReunionEnd.Text = seconds_to_string(reliability_timespans.reunion.end_sec);
+            txtNatPlayStart.Text = seconds_to_string(reliability_timespans.toy_1.start_sec);
+            txtNatPlayEnd.Text = seconds_to_string(reliability_timespans.toy_1.end_sec);
+            txtFreePlayStart.Text = seconds_to_string(reliability_timespans.toy_6.start_sec);
+            txtFreePlayEnd.Text = seconds_to_string(reliability_timespans.toy_6.end_sec);
+            //txtStillStart.Text = seconds_to_string(reliability_timespans.still_face.start_sec);
+            //txtStillEnd.Text = seconds_to_string(reliability_timespans.still_face.end_sec);
+            //txtReunionStart.Text = seconds_to_string(reliability_timespans.reunion.start_sec);
+            //txtReunionEnd.Text = seconds_to_string(reliability_timespans.reunion.end_sec);
 
             sync_list_view();
 
@@ -1158,6 +1161,7 @@ namespace Forge
             // CSV headers.
             StringBuilder SB = new StringBuilder();
             SB.Append("famid,");
+            SB.Append("coderid,");
             TaskType[] tasks = (TaskType[])Enum.GetValues(typeof(TaskType));
             MeasureType[] measures = (MeasureType[])Enum.GetValues(typeof(MeasureType));
 
@@ -1167,15 +1171,17 @@ namespace Forge
                 {
                     if (measures[i] == MeasureType.eBabyInvis)
                         continue; // not a data measure.
-                    SB.AppendFormat("oi{2}{0}{1}", Reliability.get_task_abbrev(tasks[t]), Reliability.get_measure_abbrev(measures[i]), DetectedTimepoint.Substring(1));
+
+                    SB.AppendFormat("oi{0}{1}", Reliability.get_task_abbrev(tasks[t]), Reliability.get_measure_abbrev(measures[i]));
                     //if (t != tasks.Length - 1 || i != measures.Length - 1)
                     SB.Append(",");
                 }
-                SB.AppendFormat("oi{0}{1}pac,", DetectedTimepoint.Substring(1), Reliability.get_task_abbrev(tasks[t]));
+                //SB.AppendFormat("oi{0}ac,", Reliability.get_task_abbrev(tasks[t]));
             }
-            SB.AppendFormat("oi{0}sr,", DetectedTimepoint.Substring(1));
-            SB.AppendFormat("oi{0}sfe,", DetectedTimepoint.Substring(1));
-            SB.AppendFormat("oi{0}sft", DetectedTimepoint.Substring(1));
+            SB.Remove(SB.Length - 1, 1);
+            //SB.AppendFormat("oisr,");
+            //SB.AppendFormat("oisfe,");
+            //SB.AppendFormat("oisft");
             SB.Append("\r\n");
 
             List<CodVideo> needs_accepted = new List<CodVideo>();
@@ -1201,10 +1207,12 @@ namespace Forge
                 Reliability r = new Reliability();
 
                 // separate out in to epochs
-                r.run_task(r.free_play, file.timespans.free_play, file, epoch_len_sec);
-                r.run_task(r.nat_play, file.timespans.nat_play, file, epoch_len_sec);
-                r.run_task(r.reunion, file.timespans.reunion, file, epoch_len_sec);
-                r.run_task(r.still_face, file.timespans.still_face, file, epoch_len_sec);
+                r.run_task(r.toy_1, file.timespans.toy_1, file, epoch_len_sec);
+                r.run_task(r.toy_6, file.timespans.toy_6, file, epoch_len_sec);
+                //r.run_task(r.reunion, file.timespans.reunion, file, epoch_len_sec);
+                //r.run_task(r.still_face, file.timespans.still_face, file, epoch_len_sec);
+
+
 
                 //
                 // Need:
@@ -1214,13 +1222,35 @@ namespace Forge
                 // video name is TimepointFamid
                 // timepoint is 2 characters (A3)
                 //
-                
-                string Famid = video.video.Substring(2);
+
+                string Famid = file.get_famid();
                 SB.Append(Famid);
+                SB.Append(",");
+                SB.Append(file.coder);
                 SB.Append(",");
                 for (int t = 0; t < tasks.Length; t++)
                 {                
                     ReliabilityTask task = r.get_task(tasks[t]);
+
+                    // 
+                    // Get the raw per second visibility of the task
+                    //
+                    TimeSpan task_total_time = file.timespans.get_task(tasks[t]);
+                    bool[] baby_visible_task = new bool[task_total_time.length()];
+                    for (int i = 0; i < baby_visible_task.Length; i++)
+                        baby_visible_task[i] = true;
+                    foreach (TimeSpan bi in file.baby_invisible)
+                    {
+                        if (bi.overlaps(task_total_time) == false)
+                            continue; // was in another task
+                        for (int i = 0; i < bi.length(); i++)
+                        {
+                            // get offset in to the other span, and mark as invis
+                            int second = (i + bi.start_sec) - task_total_time.start_sec;
+                            if (second > 0 && second < baby_visible_task.Length)
+                                baby_visible_task[second] = false;
+                        }
+                    }
 
                     List<bool> baby_invis = task.baby_invisible;
                     for (int m = 0; m < measures.Length; m++)
@@ -1228,40 +1258,55 @@ namespace Forge
                         if (measures[m] == MeasureType.eBabyInvis)
                             continue;
 
-                        List<bool> codes = task.GetMeasure(measures[m]);
 
-                        int count_total = 0;
-                        int count_coded = 0;
-                        for (int i = 0; i < codes.Count; i++)
+                        List<TimeSpan> measure = file.get_measure(measures[m]);
+
+                        // OK now have denom.
+                        bool[] measure_marked = new bool[task_total_time.length()];
+
+                        foreach (TimeSpan bi in measure)
                         {
-                            if (baby_invis[i])
-                                continue; // ignore codes when the baby is invis
+                            if (bi.overlaps(task_total_time) == false)
+                                continue; // in another task
 
-                            count_total++;
-                            if (codes[i])
-                                count_coded++;
+                            for (int i = 0; i < bi.length(); i++)
+                            {
+                                // get offset in to the other span, and mark as invis
+                                int second = (i + bi.start_sec) - task_total_time.start_sec;
+                                if (second > 0 && second < measure_marked.Length && baby_visible_task[second])
+                                    measure_marked[second] = true;
+                            }
                         }
 
-                        SB.Append((count_coded / (float)count_total));
-                        //if (t != tasks.Length - 1 || m != measures.Length - 1)
-                            SB.Append(",");
+                        // OK now calc %
+                        int num = 0;
+                        int den = 0;
+                        for (int i = 0; i < measure_marked.Length; i++)
+                        {
+                            if (measure_marked[i])
+                                num++;
+                            if (baby_visible_task[i])
+                                den++;
+                        }
+
+                        SB.Append(num / (float)den);
+                        SB.Append(",");
                     }
-
-                    SB.Append(file.get_paci(tasks[t]) ? "1" : "0");
-                    SB.Append(",");
                 }
+                SB.Remove(SB.Length - 1, 1);
 
-                SB.Append(file.sex_revealed ? "1," : "0,");
-                SB.Append(file.still_abort ? "1," : "0,");
 
-                if (file.still_abort)
-                    SB.Append(file.timespans.still_face.end_sec - file.timespans.still_face.start_sec);
+                //SB.Append(file.sex_revealed ? "1," : "0,");
+                //SB.Append(file.still_abort ? "1," : "0,");
+
+                //if (file.still_abort)
+                //    SB.Append(file.timespans.still_face.end_sec - file.timespans.still_face.start_sec);
             } // end for each video
 
             if (needs_accepted.Count != 0)
             {
                 StringBuilder msg = new StringBuilder();
-                msg.Append("The following videos don't have valid baseline timespans specified:\r\n");
+                msg.Append("The following videos don't have an accepted data coder specified:\r\n");
                 foreach (CodVideo v in needs_accepted)
                 {
                     msg.AppendFormat("\t{0}\r\n", v.video);
