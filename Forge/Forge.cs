@@ -198,7 +198,7 @@ namespace Forge
 
             // The epoch parsed codes for each coder who did this video.
             // Generated during reliability export - not loaded from disc.
-            public List<Reliability> reliability = new List<Reliability>();
+            public List<EpochSeparatedCodFile> reliability = new List<EpochSeparatedCodFile>();
 
             public CodFile GetCodFileByCoder(string coder)
             {
@@ -638,9 +638,7 @@ namespace Forge
         public enum TaskType
         {
             eToy1,
-            eToy6,
-            //eStillFace,
-            //eReunion
+            eToy6
         };
 
         public enum MeasureType
@@ -652,7 +650,7 @@ namespace Forge
             eInattent
         };
 
-        class ReliabilityTask
+        class EpochSeparatedMeasures
         {
             public List<bool> baby_invisible = new List<bool>();
             public List<bool> toy = new List<bool>();
@@ -660,7 +658,7 @@ namespace Forge
             public List<bool> quiet_dis = new List<bool>();
             public List<bool> inatten = new List<bool>();
 
-            public List<bool> GetMeasure(MeasureType type)
+            public List<bool> GetEpochMeasure(MeasureType type)
             {
                 switch (type)
                 {
@@ -673,20 +671,18 @@ namespace Forge
                 return null;
             }
         };
-        class Reliability : IComparable
+        class EpochSeparatedCodFile : IComparable
         {
             public string coder;
 
-            public ReliabilityTask toy_1 = new ReliabilityTask();
-            public ReliabilityTask toy_6 = new ReliabilityTask();
-            //public ReliabilityTask still_face = new ReliabilityTask();
-            //public ReliabilityTask reunion = new ReliabilityTask();
+            public EpochSeparatedMeasures toy_1 = new EpochSeparatedMeasures();
+            public EpochSeparatedMeasures toy_6 = new EpochSeparatedMeasures();
 
             public int CompareTo(object other)
             {
-                return coder.CompareTo(((Reliability)other).coder);
+                return coder.CompareTo(((EpochSeparatedCodFile)other).coder);
             }
-            public ReliabilityTask get_task(TaskType task) 
+            public EpochSeparatedMeasures get_task(TaskType task) 
             {
                 switch (task)
                 {
@@ -743,10 +739,16 @@ namespace Forge
                 }
                 throw new Exception();
             }
-            public void run_measure(TimeSpan epoch, List<bool> epoch_markings, List<TimeSpan> codes)
+
+            private static void add_marking_for_epoch(TimeSpan epoch, List<bool> epoch_markings, List<TimeSpan> marked_spans_for_code)
             {
+                //
+                // This function checks the given epoch to see if the code was present at all during the
+                // epoch, and adds it to the epoch markings.
+                //
+
                 bool epoch_marked = false;
-                foreach (TimeSpan span in codes)
+                foreach (TimeSpan span in marked_spans_for_code)
                 {
                     if (span.overlaps(epoch))
                     {
@@ -758,8 +760,9 @@ namespace Forge
                 epoch_markings.Add(epoch_marked);
             }
 
-            public void run_task(ReliabilityTask task, TimeSpan task_time, CodFile code, int epoch_len_sec)
+            public static void time_spans_to_epoch_marking(EpochSeparatedMeasures task, TimeSpan task_time, CodFile code, int epoch_len_sec)
             {
+                // Converts from time span markings to true/false epoch markings.
                 int current_epoch_start = task_time.start_sec;
                 for (; current_epoch_start < task_time.end_sec; current_epoch_start += epoch_len_sec)
                 {
@@ -767,11 +770,11 @@ namespace Forge
                     epoch.start_sec = current_epoch_start;
                     epoch.end_sec = current_epoch_start + epoch_len_sec;
 
-                    run_measure(epoch, task.baby_invisible, code.baby_invisible);
-                    run_measure(epoch, task.toy, code.toy);
-                    run_measure(epoch, task.person, code.people);
-                    run_measure(epoch, task.quiet_dis, code.quiet_dis);
-                    run_measure(epoch, task.inatten, code.inattent);
+                    add_marking_for_epoch(epoch, task.baby_invisible, code.baby_invisible);
+                    add_marking_for_epoch(epoch, task.toy, code.toy);
+                    add_marking_for_epoch(epoch, task.person, code.people);
+                    add_marking_for_epoch(epoch, task.quiet_dis, code.quiet_dis);
+                    add_marking_for_epoch(epoch, task.inatten, code.inattent);
                 }
             }
         };
@@ -843,13 +846,11 @@ namespace Forge
                 // for each epoch, for each coder.
                 foreach (CodFile code in video.codes)
                 {
-                    Reliability r = new Reliability();
+                    EpochSeparatedCodFile r = new EpochSeparatedCodFile();
                     r.coder = code.coder;
 
-                    r.run_task(r.toy_1, reliability_baselines.toy_1, code, epoch_len_sec);
-                    r.run_task(r.toy_6, reliability_baselines.toy_6, code, epoch_len_sec);
-                    //r.run_task(r.reunion, reliability_baselines.reunion, code, epoch_len_sec);
-                    //r.run_task(r.still_face, reliability_baselines.still_face, code, epoch_len_sec);
+                    EpochSeparatedCodFile.time_spans_to_epoch_marking(r.toy_1, reliability_baselines.toy_1, code, epoch_len_sec);
+                    EpochSeparatedCodFile.time_spans_to_epoch_marking(r.toy_6, reliability_baselines.toy_6, code, epoch_len_sec);
 
                     video.reliability.Add(r);
                 }
@@ -860,13 +861,13 @@ namespace Forge
 
                 for (int outer = 0; outer < (has_primary_coder ? 1 : video.reliability.Count); outer++)
                 {
-                    Reliability OuterR = (Reliability)video.reliability[outer];
+                    EpochSeparatedCodFile OuterR = (EpochSeparatedCodFile)video.reliability[outer];
                     for (int inner = outer + 1; inner < video.reliability.Count; inner++)
                     {
-                        Reliability InnerR = (Reliability)video.reliability[inner];
+                        EpochSeparatedCodFile InnerR = (EpochSeparatedCodFile)video.reliability[inner];
 
-                        Reliability one = OuterR;
-                        Reliability two = InnerR;
+                        EpochSeparatedCodFile one = OuterR;
+                        EpochSeparatedCodFile two = InnerR;
 
                         //
                         // First, we want to get the Baby Invisible kappa, since other measures
@@ -880,13 +881,13 @@ namespace Forge
 
                             foreach (TaskType task in Enum.GetValues(typeof(TaskType)))
                             {
-                                ReliabilityTask one_task = one.get_task(task);
-                                ReliabilityTask two_task = two.get_task(task);
+                                EpochSeparatedMeasures one_task = one.get_task(task);
+                                EpochSeparatedMeasures two_task = two.get_task(task);
 
-                                for (int i = 0; i < one_task.GetMeasure(MeasureType.eBabyInvis).Count; i++)
+                                for (int i = 0; i < one_task.GetEpochMeasure(MeasureType.eBabyInvis).Count; i++)
                                 {
-                                    bool one_value = one_task.GetMeasure(MeasureType.eBabyInvis)[i];
-                                    bool two_value = two_task.GetMeasure(MeasureType.eBabyInvis)[i];
+                                    bool one_value = one_task.GetEpochMeasure(MeasureType.eBabyInvis)[i];
+                                    bool two_value = two_task.GetEpochMeasure(MeasureType.eBabyInvis)[i];
 
                                     if (one_value && two_value)
                                         count_11++;
@@ -904,7 +905,7 @@ namespace Forge
                             float py = ((count_11 + count_01) / den_count) * ((count_11 + count_10) / den_count);
                             float pn = ((count_00 + count_01) / den_count) * ((count_00 + count_10) / den_count);
                             float pe = py + pn;
-                            Kappas.AppendFormat("{3} {0}x{1} {2}\r\n", one.coder, two.coder, (p0 - pe) / (1 - pe), Reliability.get_measure_str(MeasureType.eBabyInvis));
+                            Kappas.AppendFormat("{3} {0}x{1} {2}\r\n", one.coder, two.coder, (p0 - pe) / (1 - pe), EpochSeparatedCodFile.get_measure_str(MeasureType.eBabyInvis));
                         }
 
                         //
@@ -924,13 +925,13 @@ namespace Forge
 
                             foreach (TaskType task in Enum.GetValues(typeof(TaskType)))
                             {
-                                ReliabilityTask one_task = one.get_task(task);
-                                ReliabilityTask two_task = two.get_task(task);
+                                EpochSeparatedMeasures one_task = one.get_task(task);
+                                EpochSeparatedMeasures two_task = two.get_task(task);
 
-                                List<bool> one_measure = one_task.GetMeasure(measure);
-                                List<bool> two_measure = two_task.GetMeasure(measure);
-                                List<bool> one_invisible = one_task.GetMeasure(MeasureType.eBabyInvis);
-                                List<bool> two_invisible = two_task.GetMeasure(MeasureType.eBabyInvis);
+                                List<bool> one_measure = one_task.GetEpochMeasure(measure);
+                                List<bool> two_measure = two_task.GetEpochMeasure(measure);
+                                List<bool> one_invisible = one_task.GetEpochMeasure(MeasureType.eBabyInvis);
+                                List<bool> two_invisible = two_task.GetEpochMeasure(MeasureType.eBabyInvis);
 
                                 for (int i = 0; i < one_measure.Count; i++)
                                 {
@@ -953,15 +954,53 @@ namespace Forge
                                 }
                             }
 
+                            // count_00 = 0
+                            // count_01 = 0
+                            // count_10 = 2
+                            // count_11 = 47
+                            // total_count = 0 + 0 + 2 + 47
+                            // 
+                            // p0 = (count_11 + count_00) / total_count =  (47 + 0) / 49
+                            // py = ((count_11 + count_01) / total_count) * ((count_11 + count_10) / total_count) = [(47 + 0) / 49] * [(47 + 2) / 49] = 47/49
+                            // pn = ((count_00 + count_01) / total_count) * ((count_00 + count_10) / total_count) = 0
+                            // pe = py + pn = 47/49
+                            // kappa = (p0 - pe) / (1 - pe) = (47/49 - 47/49) / (1 - pe) = 0
+                            //
+                            // Expected high kappa!
+                            // => Kappa expects random data.
+                            //
+                            // Can expect kappa to be 1 on perfect match on 50% data.
+                            //
+                            //
+                            // count_00 = 10
+                            // count_01 = 0
+                            // count_10 = 0
+                            // count_11 = 10
+                            // total_count = 0 + 10 + 10 + 0
+                            //
+                            // p0 = (count_11 + count_00) / total_count = 20/20
+                            // py = ((count_11 + count_01) / total_count) * ((count_11 + count_10) / total_count) = [(10 + 0) / 20] * [(10 + 0) / 20] = 100/400
+                            // pn = ((count_00 + count_01) / total_count) * ((count_00 + count_10) / total_count) = [(10 + 0) / 20] * [(10 + 0) / 20] = 100/400
+                            // pe = py + pn = 200/400
+                            // kappa = (p0 - pe) / (1 - pe) = (1 - 1/2) / (1 - 1/2) = 1/2 / 1/2 = 1
+
+
                             float den_count = (float)(count_00 + count_01 + count_10 + count_11);
                             float p0 = (count_11 + count_00) / den_count;
                             float py = ((count_11 + count_01) / den_count) * ((count_11 + count_10) / den_count);
                             float pn = ((count_00 + count_01) / den_count) * ((count_00 + count_10) / den_count);
                             float pe = py + pn;
-                            Kappas.AppendFormat("{2} {0}x{1} {3} {4}/{5}\r\n", one.coder, two.coder, Reliability.get_measure_str(measure), (p0 - pe) / (1 - pe), den_count, count_total);
+                            float kappa = (p0 - pe) / (1 - pe);
+                            Kappas.AppendFormat("{2} {0}x{1} {3} {4}/{5}\r\n", one.coder, two.coder, EpochSeparatedCodFile.get_measure_str(measure), kappa, den_count, count_total);
                         }
                     }
                 }
+
+                Kappas.Append("; NaN means neither coder ever entered 1 for the measure\r\n");
+                Kappas.Append("; The last entry (#/#) represents the number of accepted epochs due to baby visible. If either\r\n");
+                Kappas.Append("; coder entered baby invisible, an epoch is removed.\r\n");
+                Kappas.Append("; 0 kappa most likely means only 1 epoch was non zero for either coder\r\n");
+                Kappas.Append("; and they disagreed.\r\n");
 
                 {
                     syntax.Append("*-----------------------------.\r\n");
@@ -978,10 +1017,10 @@ namespace Forge
                     // Need each combo.
                     for (int outer = 0; outer < (has_primary_coder ? 1 : video.reliability.Count); outer++)
                     {
-                        Reliability OuterR = (Reliability)video.reliability[outer];
+                        EpochSeparatedCodFile OuterR = (EpochSeparatedCodFile)video.reliability[outer];
                         for (int inner = outer + 1; inner < video.reliability.Count; inner++)
                         {
-                            Reliability InnerR = (Reliability)video.reliability[inner];
+                            EpochSeparatedCodFile InnerR = (EpochSeparatedCodFile)video.reliability[inner];
 
                             syntax.Append("*---------------.\r\n");
                             syntax.AppendFormat("* {0} x {1}.\r\n", OuterR.coder, InnerR.coder);
@@ -1018,7 +1057,7 @@ namespace Forge
                 SB.Append("epoch,");
                 for (int r = 0; r < video.reliability.Count; r++)
                 {
-                    Reliability R = (Reliability)video.reliability[r];
+                    EpochSeparatedCodFile R = (EpochSeparatedCodFile)video.reliability[r];
                     SB.AppendFormat("b{0},f{0},p{0},q{0},i{0}", R.coder);
                     if (r < video.reliability.Count - 1)
                         SB.Append(",");
@@ -1035,14 +1074,14 @@ namespace Forge
 
                         SB.Append(video.codes[0].get_famid());
                         SB.Append("_");
-                        SB.Append(Reliability.get_task_str(task));
+                        SB.Append(EpochSeparatedCodFile.get_task_str(task));
                         SB.Append(current_epoch);
                         SB.Append(",");
 
                         for (int r = 0; r < video.reliability.Count; r++)
                         {
-                            Reliability R = (Reliability)video.reliability[r];
-                            ReliabilityTask RT = R.get_task(task);
+                            EpochSeparatedCodFile R = (EpochSeparatedCodFile)video.reliability[r];
+                            EpochSeparatedMeasures RT = R.get_task(task);
 
                             SB.Append(RT.baby_invisible[current_epoch] ? "1," : "0,");
                             SB.Append(RT.toy[current_epoch] ? "1," : "0,");
@@ -1151,38 +1190,70 @@ namespace Forge
 
             save_decisions();
 
-            //
-            // Go over EVERY video, and quantize the codes to the requested
-            // epoch size, then compute the porportion of set codes for each
-            // task / measure.
-            //
-            int epoch_len_sec = Decisions.saved_epoch_amount;
+            // Variable description.
+            StringBuilder desc = new StringBuilder();
+            desc.Append("(r)oi(f1,f6)vc: Total seconds baby visible for task\r\n");
+            desc.Append("(r)oi(f1,f6)tc: Clipped seconds for task\r\n");
+            desc.Append("(r)oi(f1,f6)oc: Original seconds for task\r\n");            
+
+            desc.Append("(r)oi(f1,f6)toy: Percent of clipped time baby looked at toy\r\n");
+            desc.Append("(r)oi(f1,f6)per: Percent of clipped time baby looked at person\r\n");
+            desc.Append("(r)oi(f1,f6)qdi: Percent of clipped time baby quiet disengaged\r\n");
+            desc.Append("(r)oi(f1,f6)ina: Percent of clipped time baby inattentive\r\n");
+            
+            desc.Append("(r)oi(f1,f6)toymc: Total seconds baby looked at toy\r\n");
+            desc.Append("(r)oi(f1,f6)permc: Total seconds baby looked at person\r\n");
+            desc.Append("(r)oi(f1,f6)qdimc: Total seconds baby quiet disengaged\r\n");
+            desc.Append("(r)oi(f1,f6)inamc: Total seconds baby inattentive\r\n");
+
+            desc.Append("(r)oi(f1,f6)tmc: Total seconds marked for task\r\n");
+
 
             // CSV headers.
-            StringBuilder SB = new StringBuilder();
-            SB.Append("famid,");
-            SB.Append("coderid,");
+            StringBuilder rejected_data = new StringBuilder();
+            StringBuilder accepted_data = new StringBuilder();
+            accepted_data.Append("famid,");
+            rejected_data.Append("famid,");
+            accepted_data.Append("coderid,");
+            rejected_data.Append("coderid,");
             TaskType[] tasks = (TaskType[])Enum.GetValues(typeof(TaskType));
             MeasureType[] measures = (MeasureType[])Enum.GetValues(typeof(MeasureType));
 
             for (int t = 0; t < tasks.Length; t++)
-            {                
+            {
+                accepted_data.AppendFormat("oi{0}vc,", EpochSeparatedCodFile.get_task_abbrev(tasks[t]));
+                rejected_data.AppendFormat("roi{0}vc,", EpochSeparatedCodFile.get_task_abbrev(tasks[t]));
+                accepted_data.AppendFormat("oi{0}tc,", EpochSeparatedCodFile.get_task_abbrev(tasks[t]));
+                rejected_data.AppendFormat("roi{0}tc,", EpochSeparatedCodFile.get_task_abbrev(tasks[t]));
+                accepted_data.AppendFormat("oi{0}oc,", EpochSeparatedCodFile.get_task_abbrev(tasks[t]));
+                rejected_data.AppendFormat("roi{0}oc,", EpochSeparatedCodFile.get_task_abbrev(tasks[t]));
                 for (int i = 0; i < measures.Length; i++)
                 {
                     if (measures[i] == MeasureType.eBabyInvis)
                         continue; // not a data measure.
 
-                    SB.AppendFormat("oi{0}{1}", Reliability.get_task_abbrev(tasks[t]), Reliability.get_measure_abbrev(measures[i]));
-                    //if (t != tasks.Length - 1 || i != measures.Length - 1)
-                    SB.Append(",");
+                    accepted_data.AppendFormat("oi{0}{1},", EpochSeparatedCodFile.get_task_abbrev(tasks[t]), EpochSeparatedCodFile.get_measure_abbrev(measures[i]));
+                    rejected_data.AppendFormat("roi{0}{1},", EpochSeparatedCodFile.get_task_abbrev(tasks[t]), EpochSeparatedCodFile.get_measure_abbrev(measures[i]));                    
                 }
-                //SB.AppendFormat("oi{0}ac,", Reliability.get_task_abbrev(tasks[t]));
+
+                for (int i = 0; i < measures.Length; i++)
+                {
+                    if (measures[i] == MeasureType.eBabyInvis)
+                        continue; // not a data measure.
+
+                    accepted_data.AppendFormat("oi{0}{1}mc,", EpochSeparatedCodFile.get_task_abbrev(tasks[t]), EpochSeparatedCodFile.get_measure_abbrev(measures[i]));
+                    rejected_data.AppendFormat("roi{0}{1}mc,", EpochSeparatedCodFile.get_task_abbrev(tasks[t]), EpochSeparatedCodFile.get_measure_abbrev(measures[i]));
+                }
+
+                accepted_data.AppendFormat("oi{0}tmc,", EpochSeparatedCodFile.get_task_abbrev(tasks[t]));
+                rejected_data.AppendFormat("roi{0}tmc,", EpochSeparatedCodFile.get_task_abbrev(tasks[t]));
             }
-            SB.Remove(SB.Length - 1, 1);
-            //SB.AppendFormat("oisr,");
-            //SB.AppendFormat("oisfe,");
-            //SB.AppendFormat("oisft");
-            SB.Append("\r\n");
+
+            accepted_data.Remove(accepted_data.Length - 1, 1);
+            rejected_data.Remove(accepted_data.Length - 1, 1);
+
+            accepted_data.Append("\r\n");
+            rejected_data.Append("\r\n");
 
             List<CodVideo> needs_accepted = new List<CodVideo>();
 
@@ -1190,12 +1261,12 @@ namespace Forge
             {
                 CodVideo video = pair.Value;
 
-                CodFile file = video.codes[0];                
+                CodFile accepted_file = null;
                 if (video.codes.Count > 1)
                 {
                     // Look up the accepted coder.
                     if (Decisions.accepted_coders.ContainsKey(video.video))
-                        file = video.GetCodFileByCoder(Decisions.accepted_coders[video.video]);
+                        accepted_file = video.GetCodFileByCoder(Decisions.accepted_coders[video.video]);
                     else
                     {
                         // multiple files and one hasn't been marked as the one to use.
@@ -1204,103 +1275,140 @@ namespace Forge
                     }
                 }
 
-                Reliability r = new Reliability();
+                // Go over each coder who coded the video.
+                foreach (CodFile file in video.codes)
+                {
+                    StringBuilder data = rejected_data;
+                    if (file == accepted_file)
+                        data = accepted_data;
 
-                // separate out in to epochs
-                r.run_task(r.toy_1, file.timespans.toy_1, file, epoch_len_sec);
-                r.run_task(r.toy_6, file.timespans.toy_6, file, epoch_len_sec);
-                //r.run_task(r.reunion, file.timespans.reunion, file, epoch_len_sec);
-                //r.run_task(r.still_face, file.timespans.still_face, file, epoch_len_sec);
-
-
-
-                //
-                // Need:
-                //  famid
-                //  measure_task_timepoint
-                //
-                // video name is TimepointFamid
-                // timepoint is 2 characters (A3)
-                //
-
-                string Famid = file.get_famid();
-                SB.Append(Famid);
-                SB.Append(",");
-                SB.Append(file.coder);
-                SB.Append(",");
-                for (int t = 0; t < tasks.Length; t++)
-                {                
-                    ReliabilityTask task = r.get_task(tasks[t]);
-
-                    // 
-                    // Get the raw per second visibility of the task
-                    //
-                    TimeSpan task_total_time = file.timespans.get_task(tasks[t]);
-                    bool[] baby_visible_task = new bool[task_total_time.length()];
-                    for (int i = 0; i < baby_visible_task.Length; i++)
-                        baby_visible_task[i] = true;
-                    foreach (TimeSpan bi in file.baby_invisible)
+                    string Famid = file.get_famid();
+                    data.Append(Famid);
+                    data.Append(",");
+                    data.Append(file.coder);
+                    data.Append(",");
+                    for (int t = 0; t < tasks.Length; t++)
                     {
-                        if (bi.overlaps(task_total_time) == false)
-                            continue; // was in another task
-                        for (int i = 0; i < bi.length(); i++)
+                        //
+                        // For clearfield, each task is specified to be 120 seconds.
+                        // Any time the task went longer, this makes the ratio measurement
+                        // unfair.
+                        //
+                        // So the plan is: 
+                        //  1. Cap the task length to 120.
+                        //  2. Find when the baby is visible during that 120 seconds.
+                        //  3. Find when the measure is marked during that 120 seconds.
+                        //  4. Compute the marked ratio for the measure, eliding any seconds where
+                        //      the baby is invisible.
+                        //
+
+                        TimeSpan original_task_time = file.timespans.get_task(tasks[t]);
+                        TimeSpan clipped_task_time = new TimeSpan();
+                        clipped_task_time.CopyFrom(original_task_time);
+
+                        // 1.
+                        if (clipped_task_time.length() > 120)
+                            clipped_task_time.end_sec = clipped_task_time.start_sec + 120;
+
+                        // 2.
+                        bool[] baby_visible_task = new bool[clipped_task_time.length()];
+                        for (int i = 0; i < baby_visible_task.Length; i++)
+                            baby_visible_task[i] = true;
+                        foreach (TimeSpan bi in file.baby_invisible)
                         {
-                            // get offset in to the other span, and mark as invis
-                            int second = (i + bi.start_sec) - task_total_time.start_sec;
-                            if (second > 0 && second < baby_visible_task.Length)
-                                baby_visible_task[second] = false;
-                        }
-                    }
-
-                    List<bool> baby_invis = task.baby_invisible;
-                    for (int m = 0; m < measures.Length; m++)
-                    {
-                        if (measures[m] == MeasureType.eBabyInvis)
-                            continue;
-
-
-                        List<TimeSpan> measure = file.get_measure(measures[m]);
-
-                        // OK now have denom.
-                        bool[] measure_marked = new bool[task_total_time.length()];
-
-                        foreach (TimeSpan bi in measure)
-                        {
-                            if (bi.overlaps(task_total_time) == false)
-                                continue; // in another task
-
+                            if (bi.overlaps(clipped_task_time) == false)
+                                continue; // was in another task
                             for (int i = 0; i < bi.length(); i++)
                             {
                                 // get offset in to the other span, and mark as invis
-                                int second = (i + bi.start_sec) - task_total_time.start_sec;
-                                if (second > 0 && second < measure_marked.Length && baby_visible_task[second])
-                                    measure_marked[second] = true;
+                                int second = (i + bi.start_sec) - clipped_task_time.start_sec;
+                                if (second >= 0 && second < baby_visible_task.Length)
+                                    baby_visible_task[second] = false;
                             }
                         }
 
-                        // OK now calc %
-                        int num = 0;
-                        int den = 0;
-                        for (int i = 0; i < measure_marked.Length; i++)
+                        int visible_count = 0;
+                        for (int i = 0; i < clipped_task_time.length(); i++)
                         {
-                            if (measure_marked[i])
-                                num++;
                             if (baby_visible_task[i])
-                                den++;
+                                visible_count++;
                         }
 
-                        SB.Append(num / (float)den);
-                        SB.Append(",");
+                        data.Append(visible_count);
+                        data.Append(",");
+
+                        data.Append(clipped_task_time.length());
+                        data.Append(",");
+
+                        data.Append(original_task_time.length());
+                        data.Append(",");
+
+                        int[] measure_marked_count = new int[measures.Length];
+                        bool[] anything_marked = new bool[clipped_task_time.length()];
+
+                        for (int m = 0; m < measures.Length; m++)
+                        {
+                            if (measures[m] == MeasureType.eBabyInvis)
+                                continue;
+
+                            // 3.
+                            List<TimeSpan> measure = file.get_measure(measures[m]);
+
+                            bool[] measure_marked = new bool[clipped_task_time.length()]; // default to false
+                            foreach (TimeSpan bi in measure)
+                            {
+                                if (bi.overlaps(clipped_task_time) == false)
+                                    continue; // in another task
+
+                                for (int i = 0; i < bi.length(); i++)
+                                {
+                                    // get offset in to the other span, and mark as invis
+                                    int second = (i + bi.start_sec) - clipped_task_time.start_sec;
+                                    if (second >= 0 && second < measure_marked.Length && baby_visible_task[second])
+                                    {
+                                        measure_marked[second] = true;
+                                        anything_marked[second] = true;
+                                    }
+                                }
+                            }
+
+                            // 4.
+                            int marked_count = 0;
+                            for (int i = 0; i < clipped_task_time.length(); i++)
+                            {
+                                if (measure_marked[i])
+                                    marked_count++;
+                            }
+
+                            measure_marked_count[m] = marked_count;
+
+                            data.Append(marked_count / (float)visible_count);
+                            data.Append(",");
+                        }
+
+                        int total_marked_count = 0;
+                        for (int i = 0; i < clipped_task_time.length(); i++)
+                        {
+                            if (anything_marked[i])
+                                total_marked_count++;
+                        }
+
+                        for (int m = 0; m < measures.Length; m++)
+                        {
+                            if (measures[m] == MeasureType.eBabyInvis)
+                                continue;
+
+                            data.Append(measure_marked_count[m]);
+                            data.Append(",");
+                        }
+
+                        data.Append(total_marked_count);
+                        data.Append(",");
                     }
-                }
-                SB.Remove(SB.Length - 1, 1);
+                    data.Remove(data.Length - 1, 1);
 
-
-                //SB.Append(file.sex_revealed ? "1," : "0,");
-                //SB.Append(file.still_abort ? "1," : "0,");
-
-                //if (file.still_abort)
-                //    SB.Append(file.timespans.still_face.end_sec - file.timespans.still_face.start_sec);
+                    data.Append("\r\n");
+                } // end for each coder in the video
             } // end for each video
 
             if (needs_accepted.Count != 0)
@@ -1314,7 +1422,16 @@ namespace Forge
 
                 MessageBox.Show(msg.ToString(), "Baselines Missing");
             }
-            File.WriteAllText(saveFileDialog1.FileName, SB.ToString());
+            File.WriteAllText(saveFileDialog1.FileName, accepted_data.ToString());
+
+            string rejected_filename = Path.GetDirectoryName(saveFileDialog1.FileName) + Path.DirectorySeparatorChar;
+            rejected_filename += Path.GetFileNameWithoutExtension(saveFileDialog1.FileName) + "_rejected" + Path.GetExtension(saveFileDialog1.FileName);
+            File.WriteAllText(rejected_filename, rejected_data.ToString());
+
+            string desc_filename = Path.GetDirectoryName(saveFileDialog1.FileName) + Path.DirectorySeparatorChar;
+            desc_filename += Path.GetFileNameWithoutExtension(saveFileDialog1.FileName) + "_desc" + Path.GetExtension(saveFileDialog1.FileName);
+            File.WriteAllText(desc_filename, rejected_data.ToString());
+
         }
     }
 }
