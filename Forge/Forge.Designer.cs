@@ -110,7 +110,7 @@
             // chVideo
             // 
             this.chVideo.Text = "Video";
-            this.chVideo.Width = 120;
+            this.chVideo.Width = 220;
             // 
             // chCoder
             // 
@@ -118,12 +118,13 @@
             // 
             // chAccept
             // 
-            this.chAccept.Text = "Accepted";
+            this.chAccept.Text = "Reference";
+            this.chAccept.Width = 80;
             // 
             // chNeedsBaseline
             // 
-            this.chNeedsBaseline.Text = "Needs Baseline";
-            this.chNeedsBaseline.Width = 108;
+            this.chNeedsBaseline.Text = "(ignore)";
+            this.chNeedsBaseline.Width = 10;
             // 
             // btnLoad
             // 
@@ -165,6 +166,7 @@
             this.label4.Size = new System.Drawing.Size(104, 13);
             this.label4.TabIndex = 6;
             this.label4.Text = "Baseline Timespans:";
+            this.label4.Visible = false;
             // 
             // label5
             // 
@@ -175,6 +177,7 @@
             this.label5.Size = new System.Drawing.Size(57, 13);
             this.label5.TabIndex = 7;
             this.label5.Text = "Single Toy";
+            this.label5.Visible = false;
             // 
             // label6
             // 
@@ -185,6 +188,7 @@
             this.label6.Size = new System.Drawing.Size(39, 13);
             this.label6.TabIndex = 8;
             this.label6.Text = "6 Toys";
+            this.label6.Visible = false;
             // 
             // label7
             // 
@@ -215,6 +219,7 @@
             this.txtNatPlayStart.Name = "txtNatPlayStart";
             this.txtNatPlayStart.Size = new System.Drawing.Size(68, 20);
             this.txtNatPlayStart.TabIndex = 11;
+            this.txtNatPlayStart.Visible = false;
             this.txtNatPlayStart.Leave += new System.EventHandler(this.txtNatPlayStart_Leave);
             // 
             // txtNatPlayEnd
@@ -224,6 +229,7 @@
             this.txtNatPlayEnd.Name = "txtNatPlayEnd";
             this.txtNatPlayEnd.Size = new System.Drawing.Size(68, 20);
             this.txtNatPlayEnd.TabIndex = 12;
+            this.txtNatPlayEnd.Visible = false;
             this.txtNatPlayEnd.Leave += new System.EventHandler(this.txtNatPlayEnd_Leave);
             // 
             // txtFreePlayStart
@@ -233,6 +239,7 @@
             this.txtFreePlayStart.Name = "txtFreePlayStart";
             this.txtFreePlayStart.Size = new System.Drawing.Size(67, 20);
             this.txtFreePlayStart.TabIndex = 13;
+            this.txtFreePlayStart.Visible = false;
             this.txtFreePlayStart.Leave += new System.EventHandler(this.txtFreePlayStart_Leave);
             // 
             // txtFreePlayEnd
@@ -242,6 +249,7 @@
             this.txtFreePlayEnd.Name = "txtFreePlayEnd";
             this.txtFreePlayEnd.Size = new System.Drawing.Size(67, 20);
             this.txtFreePlayEnd.TabIndex = 14;
+            this.txtFreePlayEnd.Visible = false;
             this.txtFreePlayEnd.Leave += new System.EventHandler(this.txtFreePlayEnd_Leave);
             // 
             // txtStillEnd
@@ -291,7 +299,7 @@
             this.btnAccepted.Name = "btnAccepted";
             this.btnAccepted.Size = new System.Drawing.Size(104, 23);
             this.btnAccepted.TabIndex = 19;
-            this.btnAccepted.Text = "Set Accepted";
+            this.btnAccepted.Text = "Use As Reference";
             this.btnAccepted.UseVisualStyleBackColor = true;
             this.btnAccepted.Click += new System.EventHandler(this.btnAccepted_Click);
             // 
@@ -340,6 +348,7 @@
             this.label2.Size = new System.Drawing.Size(29, 13);
             this.label2.TabIndex = 24;
             this.label2.Text = "Start";
+            this.label2.Visible = false;
             // 
             // label11
             // 
@@ -350,6 +359,7 @@
             this.label11.Size = new System.Drawing.Size(26, 13);
             this.label11.TabIndex = 25;
             this.label11.Text = "End";
+            this.label11.Visible = false;
             // 
             // txtEpoch
             // 
@@ -358,6 +368,7 @@
             this.txtEpoch.Name = "txtEpoch";
             this.txtEpoch.Size = new System.Drawing.Size(50, 20);
             this.txtEpoch.TabIndex = 26;
+            this.txtEpoch.Visible = false;
             // 
             // label12
             // 
@@ -368,6 +379,7 @@
             this.label12.Size = new System.Drawing.Size(41, 13);
             this.label12.TabIndex = 27;
             this.label12.Text = "Epoch:";
+            this.label12.Visible = false;
             // 
             // btnReliability
             // 
@@ -378,6 +390,7 @@
             this.btnReliability.TabIndex = 28;
             this.btnReliability.Text = "Export Reliability";
             this.btnReliability.UseVisualStyleBackColor = true;
+            this.btnReliability.Visible = false;
             this.btnReliability.Click += new System.EventHandler(this.btnReliability_Click);
             // 
             // btnSetBaseline
@@ -389,6 +402,7 @@
             this.btnSetBaseline.TabIndex = 29;
             this.btnSetBaseline.Text = "Use As Baseline";
             this.btnSetBaseline.UseVisualStyleBackColor = true;
+            this.btnSetBaseline.Visible = false;
             this.btnSetBaseline.Click += new System.EventHandler(this.btnSetBaseline_Click);
             // 
             // btnExportData
@@ -410,6 +424,7 @@
             this.label13.Size = new System.Drawing.Size(103, 13);
             this.label13.TabIndex = 31;
             this.label13.Text = "Detected Timepoint:";
+            this.label13.Visible = false;
             // 
             // lblTimepoint
             // 
@@ -445,7 +460,7 @@
             this.label14.Name = "label14";
             this.label14.Size = new System.Drawing.Size(63, 13);
             this.label14.TabIndex = 35;
-            this.label14.Text = "Version: .90";
+            this.label14.Text = "Version: 3.0";
             // 
             // Forge
             // 
@@ -490,7 +505,7 @@
             this.Controls.Add(this.label1);
             this.MinimumSize = new System.Drawing.Size(640, 543);
             this.Name = "Forge";
-            this.Text = "Forge - Clearfield";
+            this.Text = "Forge - Clearfield 3.0";
             this.Load += new System.EventHandler(this.Forge_Load);
             this.ResumeLayout(false);
             this.PerformLayout();

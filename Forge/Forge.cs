@@ -14,6 +14,8 @@ namespace Forge
 {
     public partial class Forge : Form
     {
+        Random R = new Random();
+
         public Forge()
         {
             InitializeComponent();
@@ -388,8 +390,10 @@ namespace Forge
                 if (codfile.errors.Count != 0)
                 {
                     // remove from the videos list and add to the errors list.
-                    video.codes.Remove(codfile);
-                    ErrorFiles.Add(codfile);
+                    // I removed this so that files that are there just to replace the bad coder
+                    // can be run and have empty spans.
+                    //video.codes.Remove(codfile);
+                    //ErrorFiles.Add(codfile);
                 }
             }
 
@@ -1215,7 +1219,7 @@ namespace Forge
             accepted_data.Append("famid,");
             rejected_data.Append("famid,");
             accepted_data.Append("coderid,");
-            rejected_data.Append("coderid,");
+            rejected_data.Append("rcoderid,");
             TaskType[] tasks = (TaskType[])Enum.GetValues(typeof(TaskType));
             MeasureType[] measures = (MeasureType[])Enum.GetValues(typeof(MeasureType));
 
@@ -1250,7 +1254,7 @@ namespace Forge
             }
 
             accepted_data.Remove(accepted_data.Length - 1, 1);
-            rejected_data.Remove(accepted_data.Length - 1, 1);
+            rejected_data.Remove(rejected_data.Length - 1, 1);
 
             accepted_data.Append("\r\n");
             rejected_data.Append("\r\n");
@@ -1269,9 +1273,14 @@ namespace Forge
                         accepted_file = video.GetCodFileByCoder(Decisions.accepted_coders[video.video]);
                     else
                     {
-                        // multiple files and one hasn't been marked as the one to use.
-                        needs_accepted.Add(video);
-                        continue;
+                        // multiple files and one hasn't been marked as the one to use - pick one at random
+                        int use_index = R.Next(video.codes.Count);
+                        accepted_file = video.codes[use_index];
+
+                        // Uncomment this to show an error if a coder hasn't been designated
+                        // as primary.
+                        //needs_accepted.Add(video);
+                        //continue;
                     }
                 }
 
@@ -1420,17 +1429,28 @@ namespace Forge
                     msg.AppendFormat("\t{0}\r\n", v.video);
                 }
 
-                MessageBox.Show(msg.ToString(), "Baselines Missing");
+                MessageBox.Show(msg.ToString(), "Errors");
             }
-            File.WriteAllText(saveFileDialog1.FileName, accepted_data.ToString());
+            string base_filename = Path.GetDirectoryName(saveFileDialog1.FileName) + Path.DirectorySeparatorChar;
+            base_filename += Path.GetFileNameWithoutExtension(saveFileDialog1.FileName) + "_reference" + Path.GetExtension(saveFileDialog1.FileName);            
 
             string rejected_filename = Path.GetDirectoryName(saveFileDialog1.FileName) + Path.DirectorySeparatorChar;
             rejected_filename += Path.GetFileNameWithoutExtension(saveFileDialog1.FileName) + "_rejected" + Path.GetExtension(saveFileDialog1.FileName);
-            File.WriteAllText(rejected_filename, rejected_data.ToString());
 
             string desc_filename = Path.GetDirectoryName(saveFileDialog1.FileName) + Path.DirectorySeparatorChar;
             desc_filename += Path.GetFileNameWithoutExtension(saveFileDialog1.FileName) + "_desc" + Path.GetExtension(saveFileDialog1.FileName);
-            File.WriteAllText(desc_filename, rejected_data.ToString());
+
+            if (File.Exists(base_filename) ||
+                File.Exists(rejected_filename) ||
+                File.Exists(desc_filename))
+            {
+                if (MessageBox.Show("One or more of the output data files exist. Overwrite?", "Warning!", MessageBoxButtons.YesNoCancel) != DialogResult.Yes)
+                    return;
+            }
+
+            File.WriteAllText(base_filename, accepted_data.ToString());
+            File.WriteAllText(rejected_filename, rejected_data.ToString());
+            File.WriteAllText(desc_filename, desc.ToString());
 
         }
     }
